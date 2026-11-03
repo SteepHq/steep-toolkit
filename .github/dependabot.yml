@@ -1,0 +1,19 @@
+# Dependabot version updates. Docs:
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# The only pinned dependencies are the GitHub Actions in .github/workflows.
+# The Python packages CI installs (pyyaml, jsonschema) are unpinned, so there
+# is no manifest for Dependabot to update.
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "ci"
