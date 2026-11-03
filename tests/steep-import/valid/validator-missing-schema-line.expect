@@ -1,0 +1,2 @@
+WARNING
+no schema line; put '# yaml-language-server: $schema=https://api.steep.app/v1/code/schema' on the first line

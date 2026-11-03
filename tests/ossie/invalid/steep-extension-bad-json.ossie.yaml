@@ -1,0 +1,17 @@
+# A STEEP extension whose data is not JSON cannot be restored.
+version: 0.2.0.dev0
+name: shop
+datasets:
+  - name: orders
+    source: shop.orders
+    fields:
+      - name: amount
+        expression:
+          sql: amount
+    metrics:
+      - name: revenue
+        expression:
+          sql: SUM(amount)
+        custom_extensions:
+          - vendor_name: STEEP
+            data: '{"module":"orders","metric":{"identifier":"revenue",}'

@@ -1,0 +1,17 @@
+{
+  "name": "steephq",
+  "owner": {
+    "name": "Steep",
+    "email": "support@steep.app"
+  },
+  "metadata": {
+    "description": "Steep's plugins for AI coding agents."
+  },
+  "plugins": [
+    {
+      "name": "steep",
+      "source": "./plugins/steep",
+      "description": "Agent skills for working with Steep: move semantic models between Steep and Apache Ossie or Snowflake semantic views."
+    }
+  ]
+}

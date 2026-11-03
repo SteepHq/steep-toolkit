@@ -1,0 +1,29 @@
+# A model metric uses a bare name that is no field of any dataset.
+version: 0.2.0.dev0
+name: shop
+datasets:
+  - name: orders
+    source: shop.orders
+    fields:
+      - name: amount
+        expression:
+          sql: amount
+      - name: customer_id
+        expression:
+          sql: customer_id
+  - name: customers
+    source: shop.customers
+    fields:
+      - name: id
+        expression:
+          sql: id
+relationships:
+  - name: orders_to_customers
+    from: orders
+    from_columns: [customer_id]
+    to: customers
+    to_columns: [id]
+metrics:
+  - name: revenue_per_customer
+    expression:
+      sql: SUM(orders.amount) / NULLIF(COUNT(DISTINCT customer_key), 0)

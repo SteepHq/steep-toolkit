@@ -1,0 +1,17 @@
+# A dataset metric references another metric; nothing may reference a metric.
+version: 0.2.0.dev0
+name: shop
+datasets:
+  - name: orders
+    source: shop.orders
+    fields:
+      - name: amount
+        expression:
+          sql: amount
+    metrics:
+      - name: revenue
+        expression:
+          sql: SUM(amount)
+      - name: double_revenue
+        expression:
+          sql: revenue * 2

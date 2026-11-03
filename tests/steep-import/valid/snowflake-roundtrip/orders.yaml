@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=https://api.steep.app/v1/code/schema
+# The Steep model in the worked example of skills/steep-to-snowflake/references/mapping.md,
+# which is also what skills/snowflake-to-steep restores from its export
+# (tests/semantic-view/valid/steep-export-example.sql), except the customer
+# entity in customers.yaml: Snowflake has no entities.
+module:
+  identifier: orders
+  schema: SALES
+  table: ORDERS
+  description: One row per order.
+  dimensions:
+    - column: COUNTRY
+      label: Country
+      type: categorical
+      synonyms:
+        - market
+  metrics:
+    - identifier: revenue
+      name: Revenue
+      synonyms:
+        - sales
+      agent_instructions: Excludes cancelled orders.
+      type: sum
+      value: ORDERS.AMOUNT
+      time: ORDERS.CREATED_AT
+      dimensions:
+        - this.*
+        - SALES.CUSTOMERS.*
+      filters:
+        - column: STATUS
+          operator: in
+          expression: paid,refunded
+      slices:
+        - name: Web
+          filter:
+            column: CHANNEL
+            operator: equals
+            expression: web
+    - identifier: smb-orders
+      name: SMB orders
+      type: count
+      time: ORDERS.CREATED_AT
+      dimensions:
+        - this.*
+        - SALES.CUSTOMERS.*
+      filters:
+        - table: CUSTOMERS
+          column: SEGMENT
+          operator: equals
+          expression: smb
+    - identifier: revenue-per-customer
+      name: Revenue per customer
+      type: derived-ratio
+      numerator: revenue
+      denominator: new-customers
+      format: number

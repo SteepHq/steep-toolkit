@@ -1,0 +1,66 @@
+# A fact-table module: dimensions, three metric types, and a join path.
+# One module per physical table. Fields are snake_case except `joinPaths`.
+module:
+  identifier: transactions          # stable handle, unique across all files
+  schema: steep_demo
+  table: fact_transactions          # physical table; identifier need not equal it
+  label: Transactions
+  description: One row per payment transaction.
+
+  dimensions:
+    - column: country
+      label: Country
+      type: country
+    - column: payment_method
+      label: Payment method
+      type: categorical
+    - column: created_at
+      label: Created at
+      type: time
+
+  metrics:
+    - identifier: revenue
+      name: Revenue
+      description: Sum of completed/settled transaction amount, in USD.
+      type: sum                     # use `type`, never `calculation`
+      value: fact_transactions.amount
+      time: fact_transactions.created_at
+      category: Commercial
+      filters:
+        - column: status
+          operator: in
+          expression: completed,settled    # comma-separated, no spaces
+      dimensions:
+        - country
+        - payment_method
+
+    - identifier: transaction_count
+      name: Transactions
+      description: Count of transaction rows.
+      type: count
+      time: fact_transactions.created_at
+      dimensions:
+        - country
+        - payment_method
+
+    - identifier: unique_customers
+      name: Unique customers
+      description: Count of distinct customers with transaction activity.
+      type: count-distinct
+      distinct_on: fact_transactions.customer_id
+      time: fact_transactions.created_at
+      dimensions:
+        - country
+
+  joinPaths:
+    # Declared from the "one" side: one transaction has many order items.
+    # Steep accepts only one-to-one / one-to-many (never many-to-one), so for a
+    # fact→dimension relationship, declare the inverse path from the dimension
+    # module instead.
+    - from:
+        column: id
+      to:
+        schema: steep_demo
+        table: fact_order_items
+        column: transaction_id
+      type: one-to-many

@@ -1,0 +1,10 @@
+# A valid module without the yaml-language-server line: a warning, not an error.
+module:
+  identifier: orders
+  schema: SALES
+  table: ORDERS
+  metrics:
+    - identifier: order-count
+      name: Order count
+      type: count
+      time: ORDERS.CREATED_AT

@@ -1,0 +1,13 @@
+module:
+  identifier: orders
+  schema: sales
+  table: orders
+  dimensions:
+    - column: created_at
+      type: time
+  metrics:
+    - identifier: revenue
+      name: Revenue
+      type: custom-value
+      time: orders.created_at
+      sql_expression: SUM(SALES.ORDERS.AMOUNT) + SUM(orders.tax) + SUM(analytics.sales.orders.fee) + SUM('x.y')

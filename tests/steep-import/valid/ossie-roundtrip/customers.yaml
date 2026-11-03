@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://api.steep.app/v1/code/schema
+# Round trip: the Steep model that tests/ossie/valid/roundtrip.ossie.yaml was
+# exported from (Postgres). Importing that document must restore these files.
+module:
+  identifier: customers
+  schema: shop
+  table: Customers
+  label: Customer accounts
+  description: One row per customer.
+  synonyms:
+    - clients
+  dimensions:
+    - column: segment
+      label: Segment
+      type: categorical
+  metrics:
+    - identifier: new_customers
+      name: New customers
+      type: count-distinct
+      distinct_on: Customers.id
+      time: Customers.signed_up_at
+    # Declared on the one side, sums a column of the joined many side.
+    - identifier: customer_revenue
+      name: Customer revenue
+      description: Paid order amount, by the customer's signup date.
+      type: sum
+      value: orders.amount
+      time: Customers.signed_up_at
+      filters:
+        - table: orders
+          column: status
+          operator: equals
+          expression: paid
+    - identifier: revenue_per_new_customer
+      name: Revenue per new customer
+      type: derived-ratio
+      numerator: customer_revenue
+      denominator: new_customers
+      format: number
+  joinPaths:
+    - from:
+        column: id
+      to:
+        table: orders
+        column: customer_id
+      type: one-to-many

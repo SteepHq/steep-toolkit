@@ -1,0 +1,4 @@
+targets:
+  schema: steep_demo
+  table: targets
+  extra: 1

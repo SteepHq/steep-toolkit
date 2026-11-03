@@ -1,0 +1,105 @@
+# Export of tests/steep-import/valid/ossie-roundtrip (warehouse: Postgres).
+# Importing it must restore those files.
+version: 0.2.0.dev0
+name: shop
+datasets:
+  - name: customers
+    source: shop."Customers"
+    description: One row per customer.
+    ai_context:
+      synonyms:
+        - Customer accounts
+        - clients
+    unique_keys:
+      - [id]
+    fields:
+      - name: segment
+        label: Segment
+        expression:
+          sql: segment
+        custom_extensions:
+          - vendor_name: STEEP
+            data: '{"dimension":{"column":"segment","label":"Segment","type":"categorical"}}'
+      - name: id
+        expression:
+          sql: id
+      - name: signed_up_at
+        expression:
+          sql: signed_up_at
+        dimension:
+          is_time: true
+    metrics:
+      - name: new_customers
+        expression:
+          sql: COUNT(DISTINCT id)
+        datatype: Integer
+        custom_extensions:
+          - vendor_name: STEEP
+            data: '{"module":"customers","metric":{"identifier":"new_customers","name":"New customers","type":"count-distinct","distinct_on":"Customers.id","time":"Customers.signed_up_at"}}'
+    custom_extensions:
+      - vendor_name: STEEP
+        data: '{"label":"Customer accounts","schema":"shop","table":"Customers"}'
+  - name: orders
+    source: shop.orders
+    description: One row per order.
+    fields:
+      - name: status
+        label: Status
+        expression:
+          sql: status
+        custom_extensions:
+          - vendor_name: STEEP
+            data: '{"dimension":{"column":"status","label":"Status","type":"categorical"}}'
+      - name: amount
+        expression:
+          sql: amount
+      - name: created_at
+        expression:
+          sql: created_at
+        dimension:
+          is_time: true
+      - name: customer_id
+        expression:
+          sql: customer_id
+      - name: product_id
+        expression:
+          sql: product_id
+    metrics:
+      - name: revenue
+        expression:
+          sql: SUM(amount)
+        datatype: Float
+        custom_extensions:
+          - vendor_name: STEEP
+            data: '{"module":"orders","metric":{"identifier":"revenue","name":"Revenue","type":"sum","value":"orders.amount","time":"orders.created_at","dimensions":["status"]}}'
+    custom_extensions:
+      - vendor_name: STEEP
+        data: '{"schema":"shop","table":"orders","joinPaths":[{"from":{"column":"product_id"},"to":{"table":"products","column":"id"},"type":"one-to-one"}]}'
+relationships:
+  - name: orders_to_customers
+    from: orders
+    from_columns: [customer_id]
+    to: customers
+    to_columns: [id]
+    custom_extensions:
+      - vendor_name: STEEP
+        data: '{"module":"customers","joinPath":{"from":{"column":"id"},"to":{"table":"orders","column":"customer_id"},"type":"one-to-many"}}'
+metrics:
+  - name: customer_revenue
+    expression:
+      sql: SUM(orders.amount) FILTER (WHERE orders.status = 'paid')
+    description: Paid order amount, by the customer's signup date.
+    datatype: Float
+    custom_extensions:
+      - vendor_name: STEEP
+        data: '{"module":"customers","metric":{"identifier":"customer_revenue","name":"Customer revenue","type":"sum","value":"orders.amount","time":"Customers.signed_up_at","filters":[{"table":"orders","column":"status","operator":"equals","expression":"paid"}]}}'
+  - name: revenue_per_new_customer
+    expression:
+      sql: (SUM(orders.amount) FILTER (WHERE orders.status = 'paid')) / NULLIF((COUNT(DISTINCT customers.id)), 0)
+    datatype: Float
+    custom_extensions:
+      - vendor_name: STEEP
+        data: '{"module":"customers","metric":{"identifier":"revenue_per_new_customer","name":"Revenue per new customer","type":"derived-ratio","numerator":"customer_revenue","denominator":"new_customers","format":"number"}}'
+custom_extensions:
+  - vendor_name: STEEP
+    data: '{"targets":{"schema":"shop","table":"targets"}}'

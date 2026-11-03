@@ -1,0 +1,2 @@
+table sales.orders already has a module
+a table can only be referenced by one module

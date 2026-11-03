@@ -1,0 +1,14 @@
+module:
+  identifier: orders
+  schema: sales
+  table: orders
+  dimensions:
+    - column: status
+      type: categorical
+  metrics:
+    - identifier: order_count
+      name: Orders
+      type: count
+      time: orders.created_at
+      dimensions:
+        - status

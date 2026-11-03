@@ -1,0 +1,14 @@
+module:
+  identifier: orders_copy
+  schema: sales
+  table: orders
+  dimensions:
+    - column: channel
+      type: categorical
+  metrics:
+    - identifier: order_count_by_channel
+      name: Orders by channel
+      type: count
+      time: orders.created_at
+      dimensions:
+        - channel

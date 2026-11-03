@@ -1,0 +1,33 @@
+# Unquoted Ossie names are case-insensitive: Orders.Amount is orders.amount.
+# Keywords, function names and literals are not taken for field names.
+version: 0.2.0.dev0
+name: shop
+datasets:
+  - name: orders
+    source: shop.orders
+    primary_key: [Order_ID]
+    fields:
+      - name: order_id
+        expression:
+          sql: order_id
+      - name: amount
+        expression:
+          sql: amount
+      - name: status
+        expression:
+          sql: status
+      - name: created_at
+        expression:
+          sql: created_at
+        datatype: DateTime
+    metrics:
+      - name: paid_revenue
+        expression:
+          sql: SUM(CASE WHEN Status IN ('paid', 'refunded') AND created_at >= CURRENT_DATE - INTERVAL '30' DAY THEN Amount ELSE NULL END)
+      - name: order_count
+        expression:
+          sql: COUNT (DISTINCT order_id) FILTER (WHERE status IS NOT NULL)
+metrics:
+  - name: big_revenue
+    expression:
+      sql: SUM(Orders.Amount) FILTER (WHERE ORDERS.status = 'paid' AND CAST(Orders.created_at AS DATE) > DATE '2026-01-01')

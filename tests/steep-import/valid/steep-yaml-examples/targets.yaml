@@ -1,0 +1,9 @@
+# Targets live at the ROOT of their own dedicated file, never inside a module.
+# A workspace can have exactly ONE targets definition: a second one anywhere in
+# the repo aborts the whole sync before anything is written.
+#
+# This only points Steep at the table. The table itself must follow Steep's
+# targets table format (see the help center).
+targets:
+  schema: steep_demo
+  table: targets

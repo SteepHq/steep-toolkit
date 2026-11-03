@@ -1,0 +1,1 @@
+orders.double_revenue: 'revenue' is a metric; a metric cannot reference another metric

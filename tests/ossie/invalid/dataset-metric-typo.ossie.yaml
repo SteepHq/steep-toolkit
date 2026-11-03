@@ -1,0 +1,14 @@
+# SUM(amout) names a field that does not exist.
+version: 0.2.0.dev0
+name: shop
+datasets:
+  - name: orders
+    source: shop.orders
+    fields:
+      - name: amount
+        expression:
+          sql: amount
+    metrics:
+      - name: revenue
+        expression:
+          sql: SUM(amout)

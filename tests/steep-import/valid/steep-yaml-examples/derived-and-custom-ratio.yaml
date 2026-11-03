@@ -1,0 +1,85 @@
+# Ratios: a custom-ratio (percentage from SQL) and a derived-ratio (built from
+# two other metrics by identifier). Self-contained so it's internally consistent.
+module:
+  identifier: orders
+  schema: steep_demo
+  table: fact_orders
+  label: Orders
+  description: One row per order.
+
+  dimensions:
+    - column: country
+      label: Country
+      type: country
+    - column: created_at
+      label: Created at
+      type: time
+
+  metrics:
+    # --- base metrics that the derived-ratio references by identifier ---
+    - identifier: order_revenue
+      name: Order revenue
+      description: Sum of order value in USD.
+      type: sum
+      value: fact_orders.value
+      time: fact_orders.created_at
+      dimensions:
+        - country
+      slices:
+        # Always give slices an explicit identifier: derived ratios reference
+        # it, and duplicate identifiers stop the sync.
+        - name: US
+          identifier: us
+          filter:
+            column: country
+            operator: equals
+            expression: US
+
+    - identifier: order_count
+      name: Orders
+      description: Count of orders.
+      type: count
+      time: fact_orders.created_at
+      dimensions:
+        - country
+
+    # --- custom-ratio: a percentage computed from two SQL expressions ---
+    - identifier: completed_order_rate
+      name: Completed order rate
+      description: Share of orders that reached completed status.
+      type: custom-ratio
+      numerator_sql: "SUM(CASE WHEN fact_orders.status = 'completed' THEN 1 END)"
+      denominator_sql: "COUNT(*)"
+      format: percentage
+      time: fact_orders.created_at
+      dimensions:
+        - country
+
+    # --- derived-ratio: numerator/denominator are METRIC IDENTIFIERS, not SQL.
+    # No `time`, no module binding. Its dimensions must be a SUBSET of the
+    # numerator metric's dimensions (order_revenue has [country]), extra
+    # dimensions are dropped silently.
+    - identifier: avg_order_value
+      name: Average order value
+      description: Revenue per order (order_revenue / order_count).
+      type: derived-ratio
+      numerator: order_revenue
+      denominator: order_count
+      format: number
+      dimensions:
+        - country
+
+    # derived-ratio referencing a SLICE of a base metric via { metric, slice }.
+    # `slice` is the slice's IDENTIFIER (not its name), defined on the referenced
+    # metric. A derived-ratio cannot define its own slices: block.
+    - identifier: avg_us_order_value
+      name: Average US order value
+      description: US order revenue per order.
+      type: derived-ratio
+      numerator:
+        metric: order_revenue
+        slice: us
+      denominator: order_count
+      format: number
+      dimensions:
+        - country

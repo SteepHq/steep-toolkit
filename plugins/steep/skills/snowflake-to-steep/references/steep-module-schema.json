@@ -1,0 +1,1495 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Steep module file",
+  "description": "A Steep as code YAML file defining a `module`.",
+  "type": "object",
+  "properties": {
+    "module": {
+      "$ref": "#/$defs/Steep.Module"
+    }
+  },
+  "required": [
+    "module"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "Steep.Module": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "Unique name for the module within the workspace."
+        },
+        "schema": {
+          "type": "string",
+          "description": "Name of the database schema."
+        },
+        "table": {
+          "type": "string",
+          "description": "Name of the database table."
+        },
+        "label": {
+          "description": "Display name for the module",
+          "type": "string"
+        },
+        "description": {
+          "description": "A short explanation of the table's contents. Helps teams understand what data the module represents.",
+          "type": "string"
+        },
+        "synonyms": {
+          "description": "Other names people use for the data in this module, for example \"users\" for a customers table. Agents see them with every metric built on this module, so you don't need to repeat them on each metric.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_instructions": {
+          "description": "Guidance for AI agents that applies to every metric built on this module, for example how the data is collected or when it's complete. Put guidance that only applies to one metric or dimension on that metric or dimension instead.",
+          "type": "string"
+        },
+        "dimensions": {
+          "description": "Array of dimension definitions for this module",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.Dimension"
+          }
+        },
+        "metrics": {
+          "description": "Array of metric definitions for this module",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.Metric"
+          }
+        },
+        "joinPaths": {
+          "description": "Array of join path definitions to other modules. Declare each join once, in the module on the one side of the relationship. Steep follows a join in both directions.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.JoinPath"
+          }
+        },
+        "accessPolicies": {
+          "description": "Array of access policy definitions for this module.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.AccessPolicy"
+          }
+        },
+        "entities": {
+          "description": "Array of entity definitions for this module",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.Entity"
+          }
+        }
+      },
+      "required": [
+        "identifier",
+        "schema",
+        "table"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.Dimension": {
+      "type": "object",
+      "properties": {
+        "column": {
+          "type": "string",
+          "description": "The name of the database column. It is also used to match report filters. Dimensions can only be defined for string or boolean columns."
+        },
+        "identifier": {
+          "description": "Unique identifier for the dimension within the module. Auto-generated from the column name if omitted.",
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "description": "The display name of the dimension. If not defined, the column name will be used.",
+          "type": "string"
+        },
+        "description": {
+          "description": "A short explanation of what the dimension represents. Helps both data teams and business users understand its purpose. (currently not displayed for members)",
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "categorical",
+            "city",
+            "country",
+            "h3-cell-index",
+            "time"
+          ],
+          "description": "The dimension type."
+        },
+        "synonyms": {
+          "description": "Other names people use for this dimension, for example \"market\" for a country dimension.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_instructions": {
+          "description": "Guidance for AI agents on using this dimension, for example when to use another dimension instead.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "column",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.Metric": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Steep.DerivedRatioMetric"
+        },
+        {
+          "$ref": "#/$defs/Steep.SumMetric"
+        },
+        {
+          "$ref": "#/$defs/Steep.RatioMetric"
+        },
+        {
+          "$ref": "#/$defs/Steep.CountMetric"
+        },
+        {
+          "$ref": "#/$defs/Steep.CountDistinctMetric"
+        },
+        {
+          "$ref": "#/$defs/Steep.CustomValueMetric"
+        },
+        {
+          "$ref": "#/$defs/Steep.CustomRatioMetric"
+        }
+      ]
+    },
+    "Steep.DerivedRatioMetric": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "Unique metric identifier, used for referencing the metric."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the metric."
+        },
+        "description": {
+          "description": "Explanation of what the metric measures. Helps data teams and business users understand its purpose.",
+          "type": "string"
+        },
+        "synonyms": {
+          "description": "Other names people use for this metric, such as abbreviations or terms in other languages, for example \"sales\" or \"turnover\" for revenue.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_instructions": {
+          "description": "Guidance for AI agents on using this metric, for example whether a lower number is better, how it's usually split, or when to use another metric instead.",
+          "type": "string"
+        },
+        "examples": {
+          "description": "Questions this metric answers, phrased the way people ask them.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dimensions": {
+          "description": "List of dimension columns available on the metric. Format: `schema.table.column`. schema and table are optional and can be omitted if same as current module. `this.*` can be used to get all dimensions from current module, while `schema.table.*` can be used to get all dimensions from a joined code module.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "category": {
+          "description": "Metric category. You can add one category.",
+          "type": "string"
+        },
+        "owner_emails": {
+          "description": "Email addresses of one or more metric owners. Must be workspace members.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "is_private": {
+          "description": "Whether the metric is private. Defaults to false.",
+          "type": "boolean"
+        },
+        "is_unlisted": {
+          "description": "Whether the metric is unlisted. Defaults to false.",
+          "type": "boolean"
+        },
+        "time_grains": {
+          "description": "List of available time grains. Defaults to all time grains.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "yearly"
+            ]
+          }
+        },
+        "time_resampling": {
+          "description": "Time resampling method. Defaults depends on the calculation type.",
+          "type": "string",
+          "enum": [
+            "sum/divide",
+            "average/repeat"
+          ]
+        },
+        "filters": {
+          "description": "One or more filters applied to the metric. ",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricFilter"
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "derived-ratio"
+          ],
+          "description": "Metric type."
+        },
+        "calculation": {
+          "type": "string",
+          "deprecated": true,
+          "description": "Deprecated alias of `type`. Ignored when `type` is set, so use `type` instead."
+        },
+        "numerator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "metric": {
+                  "type": "string",
+                  "description": "Identifier of the referenced metric."
+                },
+                "slice": {
+                  "description": "Identifier of a slice on the referenced metric.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "metric"
+              ],
+              "additionalProperties": false
+            }
+          ],
+          "description": "For ratio metrics, the column used for ratio calculations in the format: `table.column`.   For derived ratio metrics, a reference to the numerator metric: a metric identifier, or an object with format `{ metric, slice? }`."
+        },
+        "denominator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "metric": {
+                  "type": "string",
+                  "description": "Identifier of the referenced metric."
+                },
+                "slice": {
+                  "description": "Identifier of a slice on the referenced metric.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "metric"
+              ],
+              "additionalProperties": false
+            }
+          ],
+          "description": "For ratio metrics, the column used for ratio calculations in the format: `table.column`.   For derived ratio metrics, a reference to the denominator metric: a metric identifier, or an object with format `{ metric, slice? }`."
+        },
+        "format": {
+          "default": "percentage",
+          "description": "Format of a ratio metric. Defaults to 'percentage'.",
+          "type": "string",
+          "enum": [
+            "number",
+            "percentage"
+          ]
+        }
+      },
+      "required": [
+        "identifier",
+        "name",
+        "type",
+        "numerator",
+        "denominator"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.MetricFilter": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "description": "Name of the database schema. Optional if same schema as current module.",
+          "type": "string"
+        },
+        "table": {
+          "description": "Name of the database table. Optional if same table as current module.",
+          "type": "string"
+        },
+        "column": {
+          "type": "string",
+          "description": "Name of the database column."
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "equals",
+            "not-equals",
+            "less-than",
+            "less-than-or-equal",
+            "greater-than",
+            "greater-than-or-equal",
+            "in",
+            "not-in",
+            "is",
+            "is-not",
+            "like",
+            "not-like"
+          ],
+          "description": "The operator to use for the filter."
+        },
+        "expression": {
+          "type": "string",
+          "description": "The expression to use for the filter."
+        }
+      },
+      "required": [
+        "column",
+        "operator",
+        "expression"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.SumMetric": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "Unique metric identifier, used for referencing the metric."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the metric."
+        },
+        "description": {
+          "description": "Explanation of what the metric measures. Helps data teams and business users understand its purpose.",
+          "type": "string"
+        },
+        "synonyms": {
+          "description": "Other names people use for this metric, such as abbreviations or terms in other languages, for example \"sales\" or \"turnover\" for revenue.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_instructions": {
+          "description": "Guidance for AI agents on using this metric, for example whether a lower number is better, how it's usually split, or when to use another metric instead.",
+          "type": "string"
+        },
+        "examples": {
+          "description": "Questions this metric answers, phrased the way people ask them.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dimensions": {
+          "description": "List of dimension columns available on the metric. Format: `schema.table.column`. schema and table are optional and can be omitted if same as current module. `this.*` can be used to get all dimensions from current module, while `schema.table.*` can be used to get all dimensions from a joined code module.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "category": {
+          "description": "Metric category. You can add one category.",
+          "type": "string"
+        },
+        "time": {
+          "type": "string",
+          "description": "Column used to analyze the metric over time. Format: `table.column`. You can add only one time column."
+        },
+        "owner_emails": {
+          "description": "Email addresses of one or more metric owners. Must be workspace members.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "is_private": {
+          "description": "Whether the metric is private. Defaults to false.",
+          "type": "boolean"
+        },
+        "is_unlisted": {
+          "description": "Whether the metric is unlisted. Defaults to false.",
+          "type": "boolean"
+        },
+        "time_grains": {
+          "description": "List of available time grains. Defaults to all time grains.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "yearly"
+            ]
+          }
+        },
+        "time_resampling": {
+          "description": "Time resampling method. Defaults depends on the calculation type.",
+          "type": "string",
+          "enum": [
+            "sum/divide",
+            "average/repeat"
+          ]
+        },
+        "time_aggregation": {
+          "description": "Time aggregation mode. Set to `last-date` for a snapshot/point-in-time metric instead of a standard time series. Omit for the default (standard) aggregation.",
+          "type": "string",
+          "const": "last-date"
+        },
+        "slices": {
+          "description": "One or more slices of the metric.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricSlice"
+          }
+        },
+        "cohort": {
+          "description": "Cohort configuration for the metric.",
+          "$ref": "#/$defs/Steep.MetricCohort"
+        },
+        "cohorts_only": {
+          "description": "Restrict the metric to cohort analysis only; all other visualizations are disabled. Only meaningful when a cohort is defined.",
+          "type": "boolean"
+        },
+        "filters": {
+          "description": "One or more filters applied to the metric. ",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricFilter"
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "sum"
+          ],
+          "description": "Metric type."
+        },
+        "calculation": {
+          "type": "string",
+          "deprecated": true,
+          "description": "Deprecated alias of `type`. Ignored when `type` is set, so use `type` instead."
+        },
+        "value": {
+          "type": "string",
+          "description": "Column used for sum calculations. Format: `table.column`."
+        }
+      },
+      "required": [
+        "identifier",
+        "name",
+        "time",
+        "type",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.MetricSlice": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the metric slice."
+        },
+        "identifier": {
+          "description": "Unique identifier for the slice within the metric. Auto-generated from the name if omitted.",
+          "type": "string"
+        },
+        "filter": {
+          "description": "Filter applied to the metric slice.",
+          "$ref": "#/$defs/Steep.MetricFilter"
+        }
+      },
+      "required": [
+        "name",
+        "filter"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.MetricCohort": {
+      "type": "object",
+      "properties": {
+        "time_dimension": {
+          "type": "string",
+          "description": "The date/time column the cohort groups by, e.g. signup date. Must be a date or time column. Format: `schema.table.column`. Schema and table are optional and can be omitted if same as current module."
+        },
+        "label": {
+          "description": "Display name of the cohort.",
+          "type": "string"
+        },
+        "calculate_retention": {
+          "default": false,
+          "description": "Whether to show values as a percentage of the cohort's initial value. Defaults to false.",
+          "type": "boolean"
+        },
+        "time_grains": {
+          "description": "List of available cohort time grains. Defaults to all time grains.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "yearly"
+            ]
+          }
+        },
+        "delta_time_calculation_type": {
+          "default": "calendar-periods",
+          "description": "How elapsed time is bucketed relative to the cohort start. Possible values are `calendar-periods` and `rolling-periods`. Defaults to `calendar-periods`.",
+          "type": "string",
+          "enum": [
+            "calendar-periods",
+            "rolling-periods"
+          ]
+        }
+      },
+      "required": [
+        "time_dimension"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.RatioMetric": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "Unique metric identifier, used for referencing the metric."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the metric."
+        },
+        "description": {
+          "description": "Explanation of what the metric measures. Helps data teams and business users understand its purpose.",
+          "type": "string"
+        },
+        "synonyms": {
+          "description": "Other names people use for this metric, such as abbreviations or terms in other languages, for example \"sales\" or \"turnover\" for revenue.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_instructions": {
+          "description": "Guidance for AI agents on using this metric, for example whether a lower number is better, how it's usually split, or when to use another metric instead.",
+          "type": "string"
+        },
+        "examples": {
+          "description": "Questions this metric answers, phrased the way people ask them.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dimensions": {
+          "description": "List of dimension columns available on the metric. Format: `schema.table.column`. schema and table are optional and can be omitted if same as current module. `this.*` can be used to get all dimensions from current module, while `schema.table.*` can be used to get all dimensions from a joined code module.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "category": {
+          "description": "Metric category. You can add one category.",
+          "type": "string"
+        },
+        "time": {
+          "type": "string",
+          "description": "Column used to analyze the metric over time. Format: `table.column`. You can add only one time column."
+        },
+        "owner_emails": {
+          "description": "Email addresses of one or more metric owners. Must be workspace members.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "is_private": {
+          "description": "Whether the metric is private. Defaults to false.",
+          "type": "boolean"
+        },
+        "is_unlisted": {
+          "description": "Whether the metric is unlisted. Defaults to false.",
+          "type": "boolean"
+        },
+        "time_grains": {
+          "description": "List of available time grains. Defaults to all time grains.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "yearly"
+            ]
+          }
+        },
+        "time_resampling": {
+          "description": "Time resampling method. Defaults depends on the calculation type.",
+          "type": "string",
+          "enum": [
+            "sum/divide",
+            "average/repeat"
+          ]
+        },
+        "time_aggregation": {
+          "description": "Time aggregation mode. Set to `last-date` for a snapshot/point-in-time metric instead of a standard time series. Omit for the default (standard) aggregation.",
+          "type": "string",
+          "const": "last-date"
+        },
+        "slices": {
+          "description": "One or more slices of the metric.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricSlice"
+          }
+        },
+        "cohort": {
+          "description": "Cohort configuration for the metric.",
+          "$ref": "#/$defs/Steep.MetricCohort"
+        },
+        "cohorts_only": {
+          "description": "Restrict the metric to cohort analysis only; all other visualizations are disabled. Only meaningful when a cohort is defined.",
+          "type": "boolean"
+        },
+        "filters": {
+          "description": "One or more filters applied to the metric. ",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricFilter"
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ratio"
+          ],
+          "description": "Metric type."
+        },
+        "calculation": {
+          "type": "string",
+          "deprecated": true,
+          "description": "Deprecated alias of `type`. Ignored when `type` is set, so use `type` instead."
+        },
+        "numerator": {
+          "type": "string",
+          "description": "For ratio metrics, the column used for ratio calculations in the format: `table.column`.   For derived ratio metrics, a reference to the numerator metric: a metric identifier, or an object with format `{ metric, slice? }`."
+        },
+        "denominator": {
+          "type": "string",
+          "description": "For ratio metrics, the column used for ratio calculations in the format: `table.column`.   For derived ratio metrics, a reference to the denominator metric: a metric identifier, or an object with format `{ metric, slice? }`."
+        },
+        "format": {
+          "default": "percentage",
+          "description": "Format of a ratio metric. Defaults to 'percentage'.",
+          "type": "string",
+          "enum": [
+            "number",
+            "percentage"
+          ]
+        }
+      },
+      "required": [
+        "identifier",
+        "name",
+        "time",
+        "type",
+        "numerator",
+        "denominator"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.CountMetric": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "Unique metric identifier, used for referencing the metric."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the metric."
+        },
+        "description": {
+          "description": "Explanation of what the metric measures. Helps data teams and business users understand its purpose.",
+          "type": "string"
+        },
+        "synonyms": {
+          "description": "Other names people use for this metric, such as abbreviations or terms in other languages, for example \"sales\" or \"turnover\" for revenue.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_instructions": {
+          "description": "Guidance for AI agents on using this metric, for example whether a lower number is better, how it's usually split, or when to use another metric instead.",
+          "type": "string"
+        },
+        "examples": {
+          "description": "Questions this metric answers, phrased the way people ask them.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dimensions": {
+          "description": "List of dimension columns available on the metric. Format: `schema.table.column`. schema and table are optional and can be omitted if same as current module. `this.*` can be used to get all dimensions from current module, while `schema.table.*` can be used to get all dimensions from a joined code module.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "category": {
+          "description": "Metric category. You can add one category.",
+          "type": "string"
+        },
+        "time": {
+          "type": "string",
+          "description": "Column used to analyze the metric over time. Format: `table.column`. You can add only one time column."
+        },
+        "owner_emails": {
+          "description": "Email addresses of one or more metric owners. Must be workspace members.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "is_private": {
+          "description": "Whether the metric is private. Defaults to false.",
+          "type": "boolean"
+        },
+        "is_unlisted": {
+          "description": "Whether the metric is unlisted. Defaults to false.",
+          "type": "boolean"
+        },
+        "time_grains": {
+          "description": "List of available time grains. Defaults to all time grains.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "yearly"
+            ]
+          }
+        },
+        "time_resampling": {
+          "description": "Time resampling method. Defaults depends on the calculation type.",
+          "type": "string",
+          "enum": [
+            "sum/divide",
+            "average/repeat"
+          ]
+        },
+        "time_aggregation": {
+          "description": "Time aggregation mode. Set to `last-date` for a snapshot/point-in-time metric instead of a standard time series. Omit for the default (standard) aggregation.",
+          "type": "string",
+          "const": "last-date"
+        },
+        "slices": {
+          "description": "One or more slices of the metric.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricSlice"
+          }
+        },
+        "cohort": {
+          "description": "Cohort configuration for the metric.",
+          "$ref": "#/$defs/Steep.MetricCohort"
+        },
+        "cohorts_only": {
+          "description": "Restrict the metric to cohort analysis only; all other visualizations are disabled. Only meaningful when a cohort is defined.",
+          "type": "boolean"
+        },
+        "filters": {
+          "description": "One or more filters applied to the metric. ",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricFilter"
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "count"
+          ],
+          "description": "Metric type."
+        },
+        "calculation": {
+          "type": "string",
+          "deprecated": true,
+          "description": "Deprecated alias of `type`. Ignored when `type` is set, so use `type` instead."
+        }
+      },
+      "required": [
+        "identifier",
+        "name",
+        "time",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.CountDistinctMetric": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "Unique metric identifier, used for referencing the metric."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the metric."
+        },
+        "description": {
+          "description": "Explanation of what the metric measures. Helps data teams and business users understand its purpose.",
+          "type": "string"
+        },
+        "synonyms": {
+          "description": "Other names people use for this metric, such as abbreviations or terms in other languages, for example \"sales\" or \"turnover\" for revenue.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_instructions": {
+          "description": "Guidance for AI agents on using this metric, for example whether a lower number is better, how it's usually split, or when to use another metric instead.",
+          "type": "string"
+        },
+        "examples": {
+          "description": "Questions this metric answers, phrased the way people ask them.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dimensions": {
+          "description": "List of dimension columns available on the metric. Format: `schema.table.column`. schema and table are optional and can be omitted if same as current module. `this.*` can be used to get all dimensions from current module, while `schema.table.*` can be used to get all dimensions from a joined code module.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "category": {
+          "description": "Metric category. You can add one category.",
+          "type": "string"
+        },
+        "time": {
+          "type": "string",
+          "description": "Column used to analyze the metric over time. Format: `table.column`. You can add only one time column."
+        },
+        "owner_emails": {
+          "description": "Email addresses of one or more metric owners. Must be workspace members.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "is_private": {
+          "description": "Whether the metric is private. Defaults to false.",
+          "type": "boolean"
+        },
+        "is_unlisted": {
+          "description": "Whether the metric is unlisted. Defaults to false.",
+          "type": "boolean"
+        },
+        "time_grains": {
+          "description": "List of available time grains. Defaults to all time grains.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "yearly"
+            ]
+          }
+        },
+        "time_resampling": {
+          "description": "Time resampling method. Defaults depends on the calculation type.",
+          "type": "string",
+          "enum": [
+            "sum/divide",
+            "average/repeat"
+          ]
+        },
+        "time_aggregation": {
+          "description": "Time aggregation mode. Set to `last-date` for a snapshot/point-in-time metric instead of a standard time series. Omit for the default (standard) aggregation.",
+          "type": "string",
+          "const": "last-date"
+        },
+        "slices": {
+          "description": "One or more slices of the metric.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricSlice"
+          }
+        },
+        "cohort": {
+          "description": "Cohort configuration for the metric.",
+          "$ref": "#/$defs/Steep.MetricCohort"
+        },
+        "cohorts_only": {
+          "description": "Restrict the metric to cohort analysis only; all other visualizations are disabled. Only meaningful when a cohort is defined.",
+          "type": "boolean"
+        },
+        "filters": {
+          "description": "One or more filters applied to the metric. ",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricFilter"
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "count-distinct"
+          ],
+          "description": "Metric type."
+        },
+        "calculation": {
+          "type": "string",
+          "deprecated": true,
+          "description": "Deprecated alias of `type`. Ignored when `type` is set, so use `type` instead."
+        },
+        "distinct_on": {
+          "type": "string",
+          "description": "Column to count distinct values on. Format: `table.column`."
+        }
+      },
+      "required": [
+        "identifier",
+        "name",
+        "time",
+        "type",
+        "distinct_on"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.CustomValueMetric": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "Unique metric identifier, used for referencing the metric."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the metric."
+        },
+        "description": {
+          "description": "Explanation of what the metric measures. Helps data teams and business users understand its purpose.",
+          "type": "string"
+        },
+        "synonyms": {
+          "description": "Other names people use for this metric, such as abbreviations or terms in other languages, for example \"sales\" or \"turnover\" for revenue.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_instructions": {
+          "description": "Guidance for AI agents on using this metric, for example whether a lower number is better, how it's usually split, or when to use another metric instead.",
+          "type": "string"
+        },
+        "examples": {
+          "description": "Questions this metric answers, phrased the way people ask them.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dimensions": {
+          "description": "List of dimension columns available on the metric. Format: `schema.table.column`. schema and table are optional and can be omitted if same as current module. `this.*` can be used to get all dimensions from current module, while `schema.table.*` can be used to get all dimensions from a joined code module.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "category": {
+          "description": "Metric category. You can add one category.",
+          "type": "string"
+        },
+        "time": {
+          "type": "string",
+          "description": "Column used to analyze the metric over time. Format: `table.column`. You can add only one time column."
+        },
+        "owner_emails": {
+          "description": "Email addresses of one or more metric owners. Must be workspace members.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "is_private": {
+          "description": "Whether the metric is private. Defaults to false.",
+          "type": "boolean"
+        },
+        "is_unlisted": {
+          "description": "Whether the metric is unlisted. Defaults to false.",
+          "type": "boolean"
+        },
+        "time_grains": {
+          "description": "List of available time grains. Defaults to all time grains.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "yearly"
+            ]
+          }
+        },
+        "time_resampling": {
+          "description": "Time resampling method. Defaults depends on the calculation type.",
+          "type": "string",
+          "enum": [
+            "sum/divide",
+            "average/repeat"
+          ]
+        },
+        "time_aggregation": {
+          "description": "Time aggregation mode. Set to `last-date` for a snapshot/point-in-time metric instead of a standard time series. Omit for the default (standard) aggregation.",
+          "type": "string",
+          "const": "last-date"
+        },
+        "slices": {
+          "description": "One or more slices of the metric.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricSlice"
+          }
+        },
+        "cohort": {
+          "description": "Cohort configuration for the metric.",
+          "$ref": "#/$defs/Steep.MetricCohort"
+        },
+        "cohorts_only": {
+          "description": "Restrict the metric to cohort analysis only; all other visualizations are disabled. Only meaningful when a cohort is defined.",
+          "type": "boolean"
+        },
+        "filters": {
+          "description": "One or more filters applied to the metric. ",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricFilter"
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "custom-value"
+          ],
+          "description": "Metric type."
+        },
+        "calculation": {
+          "type": "string",
+          "deprecated": true,
+          "description": "Deprecated alias of `type`. Ignored when `type` is set, so use `type` instead."
+        },
+        "sql_expression": {
+          "type": "string",
+          "description": "SQL expression that returns the metric value. Columns mentioned in expression should be of format table.column."
+        }
+      },
+      "required": [
+        "identifier",
+        "name",
+        "time",
+        "type",
+        "sql_expression"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.CustomRatioMetric": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "Unique metric identifier, used for referencing the metric."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the metric."
+        },
+        "description": {
+          "description": "Explanation of what the metric measures. Helps data teams and business users understand its purpose.",
+          "type": "string"
+        },
+        "synonyms": {
+          "description": "Other names people use for this metric, such as abbreviations or terms in other languages, for example \"sales\" or \"turnover\" for revenue.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_instructions": {
+          "description": "Guidance for AI agents on using this metric, for example whether a lower number is better, how it's usually split, or when to use another metric instead.",
+          "type": "string"
+        },
+        "examples": {
+          "description": "Questions this metric answers, phrased the way people ask them.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dimensions": {
+          "description": "List of dimension columns available on the metric. Format: `schema.table.column`. schema and table are optional and can be omitted if same as current module. `this.*` can be used to get all dimensions from current module, while `schema.table.*` can be used to get all dimensions from a joined code module.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "category": {
+          "description": "Metric category. You can add one category.",
+          "type": "string"
+        },
+        "time": {
+          "type": "string",
+          "description": "Column used to analyze the metric over time. Format: `table.column`. You can add only one time column."
+        },
+        "owner_emails": {
+          "description": "Email addresses of one or more metric owners. Must be workspace members.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "is_private": {
+          "description": "Whether the metric is private. Defaults to false.",
+          "type": "boolean"
+        },
+        "is_unlisted": {
+          "description": "Whether the metric is unlisted. Defaults to false.",
+          "type": "boolean"
+        },
+        "time_grains": {
+          "description": "List of available time grains. Defaults to all time grains.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "quarterly",
+              "yearly"
+            ]
+          }
+        },
+        "time_resampling": {
+          "description": "Time resampling method. Defaults depends on the calculation type.",
+          "type": "string",
+          "enum": [
+            "sum/divide",
+            "average/repeat"
+          ]
+        },
+        "time_aggregation": {
+          "description": "Time aggregation mode. Set to `last-date` for a snapshot/point-in-time metric instead of a standard time series. Omit for the default (standard) aggregation.",
+          "type": "string",
+          "const": "last-date"
+        },
+        "slices": {
+          "description": "One or more slices of the metric.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricSlice"
+          }
+        },
+        "cohort": {
+          "description": "Cohort configuration for the metric.",
+          "$ref": "#/$defs/Steep.MetricCohort"
+        },
+        "cohorts_only": {
+          "description": "Restrict the metric to cohort analysis only; all other visualizations are disabled. Only meaningful when a cohort is defined.",
+          "type": "boolean"
+        },
+        "filters": {
+          "description": "One or more filters applied to the metric. ",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.MetricFilter"
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "custom-ratio"
+          ],
+          "description": "Metric type."
+        },
+        "calculation": {
+          "type": "string",
+          "deprecated": true,
+          "description": "Deprecated alias of `type`. Ignored when `type` is set, so use `type` instead."
+        },
+        "numerator_sql": {
+          "type": "string",
+          "description": "SQL expression for the ratio numerator. Columns mentioned in expression should be of format table.column."
+        },
+        "denominator_sql": {
+          "type": "string",
+          "description": "SQL expression for the ratio denominator. Columns mentioned in expression should be of format table.column."
+        },
+        "format": {
+          "default": "percentage",
+          "description": "Format of a ratio metric. Defaults to 'percentage'.",
+          "type": "string",
+          "enum": [
+            "number",
+            "percentage"
+          ]
+        }
+      },
+      "required": [
+        "identifier",
+        "name",
+        "time",
+        "type",
+        "numerator_sql",
+        "denominator_sql"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.JoinPath": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "object",
+          "properties": {
+            "column": {
+              "type": "string",
+              "description": "Name of the database column."
+            }
+          },
+          "required": [
+            "column"
+          ],
+          "additionalProperties": false,
+          "description": "The column in this module to join from. In a `one-to-many` join it is unique in this module, usually its primary key."
+        },
+        "to": {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "description": "Name of the database schema. Optional if same schema as current module.",
+              "type": "string"
+            },
+            "table": {
+              "type": "string",
+              "description": "Name of the database table."
+            },
+            "column": {
+              "type": "string",
+              "description": "Name of the database column."
+            }
+          },
+          "required": [
+            "table",
+            "column"
+          ],
+          "additionalProperties": false,
+          "description": "The table and column to join to. In a `one-to-many` join this column holds the matching values, such as a `customer_id` foreign key."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "one-to-one",
+            "one-to-many"
+          ],
+          "description": "The relationship from this module to the one you join to. `one-to-one` means each row here matches at most one row there. `one-to-many` means one row here can match many rows there. To join many rows to one, declare the join as `one-to-many` in the other module."
+        }
+      },
+      "required": [
+        "from",
+        "to",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.AccessPolicy": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "description": "Name of the database schema. Optional if same schema as current module.",
+          "type": "string"
+        },
+        "table": {
+          "description": "Name of the database table. Optional if same table as current module.",
+          "type": "string"
+        },
+        "column": {
+          "type": "string",
+          "description": "The column that contains the row-level information to filter on."
+        },
+        "attribute": {
+          "type": "string",
+          "description": "The user attribute that will determine how the policy filters data for each member, in user.<name> format."
+        }
+      },
+      "required": [
+        "column",
+        "attribute"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.Entity": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "Unique identifier for the entity within the workspace, used as the sync key."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the entity."
+        },
+        "primary_key": {
+          "type": "string",
+          "description": "Name of the primary key column on the entity's module table."
+        },
+        "icon_name": {
+          "description": "Name of the icon displayed for this entity in the UI. Use a kebab-case icon name, e.g. `bar-chart`; unsupported names fall back to a default icon.",
+          "type": "string"
+        },
+        "properties": {
+          "description": "Per-instance attributes of the entity, shown as columns. At least one property is required; an entity with no properties is skipped during sync.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.EntityProperty"
+          }
+        },
+        "metrics": {
+          "description": "Identifiers of metrics shown on the entity for drill-downs. Each metric must be on the entity's table or a table joined to it.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "custom_links": {
+          "description": "Deep-links to external tools, e.g. an admin URL for one of these entities.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Steep.EntityCustomLink"
+          }
+        },
+        "synonyms": {
+          "description": "Other names people use for this entity, for example \"account\" or \"client\" for a customer.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agent_instructions": {
+          "description": "Guidance for AI agents on using this entity, for example how to read its properties.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "identifier",
+        "name",
+        "primary_key"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.EntityProperty": {
+      "type": "object",
+      "properties": {
+        "column": {
+          "type": "string",
+          "description": "Name of the column on the entity's module table."
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the property."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "number",
+            "time",
+            "date",
+            "string",
+            "boolean",
+            "uuid",
+            "geography"
+          ],
+          "description": "Value type of the property."
+        },
+        "icon_name": {
+          "description": "Name of the icon displayed alongside the property in the UI. Use a kebab-case icon name, e.g. `bar-chart`; unsupported names fall back to an icon based on the property's type.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "column",
+        "name",
+        "type"
+      ],
+      "additionalProperties": false
+    },
+    "Steep.EntityCustomLink": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Display name of the custom link."
+        },
+        "url_template": {
+          "type": "string",
+          "description": "URL template with `{column}` placeholders filled in from the entity's row data, e.g. `https://example.com/{id}`. Each placeholder must name a column on the entity's module table."
+        }
+      },
+      "required": [
+        "name",
+        "url_template"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

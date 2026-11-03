@@ -1,0 +1,48 @@
+# A module with an entities block. Entities are defined inside their module.
+module:
+  identifier: customers
+  schema: steep_demo
+  table: dim_customer
+  label: Customers
+  description: One row per customer.
+
+  dimensions:
+    - column: country
+      label: Country
+      type: country
+
+  entities:
+    - identifier: customer
+      name: Customer
+      primary_key: id
+      icon_name: user             # optional, kebab-case; an unknown name only
+                                  # warns and renders the default icon, see the
+                                  # help center for the supported icon list.
+      properties:                 # required, non-empty
+        - column: id
+          name: Customer ID
+          type: uuid
+        - column: email
+          name: Email
+          type: string
+        - column: signup_date
+          name: Signed up
+          type: date
+        - column: plan_name
+          name: Plan
+          type: string
+      metrics:                    # metric identifiers to associate with the entity
+        - unique_customers
+
+  joinPaths:
+    # An entity's linked metrics must sit on this table or one reachable by a
+    # declared join. `unique_customers` lives on fact_transactions, so without
+    # this path the entity syncs but the drill-down link does not resolve.
+    # Declared from the "one" side, as always.
+    - from:
+        column: id
+      to:
+        schema: steep_demo
+        table: fact_transactions
+        column: customer_id
+      type: one-to-many

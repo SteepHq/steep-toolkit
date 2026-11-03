@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://api.steep.app/v1/code/schema
+module:
+  identifier: orders
+  schema: shop
+  table: orders
+  description: One row per order.
+  dimensions:
+    - column: status
+      label: Status
+      type: categorical
+  metrics:
+    - identifier: revenue
+      name: Revenue
+      type: sum
+      value: orders.amount
+      time: orders.created_at
+      dimensions:
+        - status
+  # products has no module: the export keeps this in the dataset extension.
+  joinPaths:
+    - from:
+        column: product_id
+      to:
+        table: products
+        column: id
+      type: one-to-one

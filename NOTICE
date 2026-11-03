@@ -1,0 +1,35 @@
+steep-toolkit
+Agent skills for working with Steep (https://steep.app).
+
+This repository is licensed under the Apache License, Version 2.0. See LICENSE.
+
+-------------------------------------------------------------------------------
+Third-party material
+-------------------------------------------------------------------------------
+
+plugins/steep/skills/steep-to-ossie/references/ossie-schema.json
+
+  Copied unchanged from Apache Ossie (https://github.com/apache/ossie),
+  file core-spec/ossie-schema.json at commit
+  89e2e17f8249e68f30df7b29ac8852fa9dd24501.
+  Copyright The Apache Software Foundation.
+  Licensed under the Apache License, Version 2.0.
+
+  This product includes software developed at
+  The Apache Software Foundation (https://www.apache.org/).
+
+plugins/steep/skills/steep-to-snowflake/references/semantic-view-syntax.md
+
+  A summary, written for this repository, of the public Snowflake
+  documentation on semantic views. It is not a copy of that documentation;
+  the live documentation at https://docs.snowflake.com is authoritative.
+
+-------------------------------------------------------------------------------
+Trademarks
+-------------------------------------------------------------------------------
+
+Snowflake, Cortex Analyst and Snowflake Intelligence are trademarks of
+Snowflake Inc. Apache, Apache Ossie and the Apache feather logo are trademarks
+of The Apache Software Foundation. They are used here only to identify those
+products. This project is not affiliated with or endorsed by Snowflake Inc. or
+The Apache Software Foundation.
