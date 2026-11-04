@@ -49,8 +49,13 @@ Read it before writing any output.
    top-level `semantic_models:` key, or metrics with `type_params`, is the
    legacy spec. A project can mix both while it migrates. Read legacy YAML
    through "Reading the legacy spec" in the mapping.
-3. If the user only has an Ossie / OSI document (dbt writes
-   `target/osi_document.json`), use the `ossie-to-steep` skill instead.
+3. Never import from `target/osi_document.json`, the Ossie / OSI document dbt
+   also writes. It drops offsets (a week-over-week metric becomes `a - a`),
+   cumulative windows, non-additive dimensions, each metric's time dimension
+   and labels. Its filters use dbt names (`order__status`), not columns. Ask
+   for the dbt project or `semantic_manifest.json` instead. If the user has
+   only the OSI document, use the `ossie-to-steep` skill. First tell them
+   these losses mean every metric needs checking against its dbt definition.
 4. Look for an existing Steep repo: `*.yml` / `*.yaml` files whose root key is
    `module` or `targets`. If there is one, the import adds to it (step 3).
 5. Ask only for what the project cannot tell you, with these defaults:
