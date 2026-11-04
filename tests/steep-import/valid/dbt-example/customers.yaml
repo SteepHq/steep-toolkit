@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://api.steep.app/v1/code/schema
+module:
+  identifier: customers
+  schema: SALES
+  table: CUSTOMERS
+  dimensions:
+    - column: SEGMENT
+      type: categorical
+  metrics:
+    - identifier: new_customers
+      name: New customers
+      type: count
+      time: CUSTOMERS.CREATED_AT
+      dimensions:
+        - this.*
+    - identifier: total_balance
+      name: Total balance
+      type: sum
+      value: CUSTOMERS.BALANCE
+      time: CUSTOMERS.SNAPSHOT_DATE
+      time_aggregation: last-date
+      dimensions:
+        - this.*
+  joinPaths:
+    - from:
+        column: CUSTOMER_ID
+      to:
+        table: ORDERS
+        column: CUSTOMER_ID
+      type: one-to-many

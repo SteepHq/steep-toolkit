@@ -30,6 +30,7 @@ Trademarks
 
 Snowflake, Cortex Analyst and Snowflake Intelligence are trademarks of
 Snowflake Inc. Apache, Apache Ossie and the Apache feather logo are trademarks
-of The Apache Software Foundation. They are used here only to identify those
-products. This project is not affiliated with or endorsed by Snowflake Inc. or
-The Apache Software Foundation.
+of The Apache Software Foundation. dbt and MetricFlow are trademarks of
+dbt Labs, Inc. They are used here only to identify those products. This
+project is not affiliated with or endorsed by Snowflake Inc., The Apache
+Software Foundation or dbt Labs, Inc.

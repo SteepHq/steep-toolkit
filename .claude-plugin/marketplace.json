@@ -11,7 +11,7 @@
     {
       "name": "steep",
       "source": "./plugins/steep",
-      "description": "Agent skills for working with Steep: move semantic models between Steep and Apache Ossie or Snowflake semantic views."
+      "description": "Agent skills for working with Steep: move semantic models between Steep and Apache Ossie or Snowflake semantic views, and import them from the dbt Semantic Layer."
     }
   ]
 }
