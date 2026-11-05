@@ -379,19 +379,25 @@ than `0`, which matches dbt unless the metric fills nulls.
 ## Ratio metrics
 
 A dbt ratio divides two metrics, each optionally with its own `filter` and
-`alias`. Resolve each input to a Steep metric first.
+`alias`. Resolve each input to a Steep metric first. An input's extra filter
+is its input `filter` plus the ratio's own `filter`. Take the first row that
+matches:
 
 | Case | Steep |
 | --- | --- |
-| Both inputs are `sum` metrics on the same module, with the same `time` and the same filters (metric filters plus input filters), and the ratio has no filter | `ratio`, `numerator: <TABLE>.<A>`, `denominator: <TABLE>.<B>`, those `filters`, and the inputs' `time` |
+| Both inputs are `sum` metrics on the same module, with the same `time` and the same filters, and neither has an extra filter | `ratio`, `numerator: <TABLE>.<A>`, `denominator: <TABLE>.<B>`, those `filters`, and the inputs' `time` |
+| Each input has no extra filter, or one that is exactly one Steep filter | `derived-ratio`, `numerator` and `denominator` as references (see below); no `time` |
 | Both inputs on the same module, with the same `time`, otherwise | `custom-ratio`, `numerator_sql` and `denominator_sql` from each input's custom SQL, with its filters inside the aggregate |
-| Otherwise | `derived-ratio`, `numerator` and `denominator` as references; no `time` |
+| Otherwise | nothing: skip and report |
 
-A `derived-ratio` operand is the input metric's identifier. When the input (or
-the ratio itself) has a filter, the operand is `{ metric, slice }`: add a slice
-to the input metric with that one filter, unless one with the same filter is
-already there. A filter that is not exactly one Steep filter cannot be a
-slice: skip the ratio and report it.
+Prefer `derived-ratio` to `custom-ratio`, even on one module: its operands
+stay Steep metrics, and an extra filter stays a structured slice rather than
+SQL.
+
+A `derived-ratio` operand is the input metric's identifier. When the input has
+an extra filter, the operand is `{ metric, slice }`: add a slice to the input
+metric with that one filter, unless one with the same filter is already
+there.
 
 | Slice | From |
 | --- | --- |
@@ -640,8 +646,9 @@ Steep, `modules/orders.yaml`:
   `orders` reaches through its foreign entity.
 - `revenue_per_customer` divides metrics on two modules: a `derived-ratio`.
   Its label has no rate word, so `format: number`.
-- `web_revenue_share` has a filter on its numerator: it becomes a `Web` slice
-  on `revenue`. Its label says share, so `format: percentage`.
+- `web_revenue_share` has a filter on its numerator that is one Steep filter:
+  a `derived-ratio` on a `Web` slice of `revenue`, not a `custom-ratio`. Its
+  label says share, so `format: percentage`.
 - `revenue_wow` (offset) and `revenue_mtd` (cumulative) are skipped.
 
 ```yaml

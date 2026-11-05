@@ -107,7 +107,7 @@ dbt-to-steep/
 ```
 
 `steep-module-schema.json` and `validate_steep_import.py` are shared with the
-`ossie-to-steep` and `snowflake-to-steep` skills. Keep them in sync when either
+`ossie-to-steep` and `snowflake-to-steep` skills. Keep them in sync when any of them
 changes.
 
 Maintained by Steep. Spotted an inaccuracy? Tell support@steep.app.

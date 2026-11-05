@@ -88,7 +88,9 @@ Follow `references/mapping.md` in this order:
    `dimensions` (`this.*` plus the modules reachable from many to one).
 6. **Ratio and derived metrics**: same-module sums become `ratio`; other
    ratios and `a / b` derived metrics become `derived-ratio`, with filtered
-   inputs as slices. Single-module expressions are inlined. Skip the rest.
+   inputs as slices, even on one module. Use `custom-ratio` only when a
+   same-module input's filter is not one Steep filter. Single-module
+   expressions are inlined. Skip the rest.
 7. **Skip** cumulative and conversion metrics, and derived metrics with
    offsets. Report each.
 
