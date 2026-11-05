@@ -102,8 +102,8 @@ snowflake-to-steep/
 ```
 
 `steep-module-schema.json` and `validate_steep_import.py` are shared with the
-`ossie-to-steep` and `dbt-to-steep` skills. Keep them in sync when any of them
-changes.
+`ossie-to-steep`, `dbt-to-steep` and `lookml-to-steep` skills. Keep them in
+sync when any of them changes.
 
 Maintained by Steep. Spotted an inaccuracy? Tell support@steep.app.
 Last verified against the Snowflake documentation: **2026-10-29**.

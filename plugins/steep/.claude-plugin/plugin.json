@@ -1,7 +1,7 @@
 {
   "name": "steep",
-  "version": "0.2.0",
-  "description": "Agent skills for working with Steep, the metrics platform. Move semantic models between Steep and Apache Ossie or Snowflake semantic views, and import them from the dbt Semantic Layer, with validators and a report of what does not carry over.",
+  "version": "0.3.0",
+  "description": "Agent skills for working with Steep, the metrics platform. Move semantic models between Steep and Apache Ossie or Snowflake semantic views, and import them from the dbt Semantic Layer and LookML, with validators and a report of what does not carry over.",
   "author": {
     "name": "Steep",
     "url": "https://steep.app"
@@ -9,5 +9,5 @@
   "homepage": "https://steep.app",
   "repository": "https://github.com/SteepHq/steep-toolkit",
   "license": "Apache-2.0",
-  "keywords": ["steep", "semantic-layer", "metrics", "ossie", "osi", "snowflake", "semantic-view", "cortex-analyst", "dbt", "metricflow", "dbt-semantic-layer", "interoperability"]
+  "keywords": ["steep", "semantic-layer", "metrics", "ossie", "osi", "snowflake", "semantic-view", "cortex-analyst", "dbt", "metricflow", "dbt-semantic-layer", "looker", "lookml", "interoperability"]
 }

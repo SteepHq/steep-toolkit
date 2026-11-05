@@ -28,6 +28,7 @@ SUITES = {
         ROOT / "plugins/steep/skills/ossie-to-steep/scripts/validate_steep_import.py",
         ROOT / "plugins/steep/skills/snowflake-to-steep/scripts/validate_steep_import.py",
         ROOT / "plugins/steep/skills/dbt-to-steep/scripts/validate_steep_import.py",
+        ROOT / "plugins/steep/skills/lookml-to-steep/scripts/validate_steep_import.py",
     ],
     "ossie": [ROOT / "plugins/steep/skills/steep-to-ossie/scripts/validate_ossie.py"],
     "semantic-view": [ROOT / "plugins/steep/skills/steep-to-snowflake/scripts/validate_semantic_view.py"],

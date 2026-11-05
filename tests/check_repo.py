@@ -18,7 +18,8 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PLUGIN = "plugins/steep"
 
-IMPORT_SKILLS = ["ossie-to-steep", "snowflake-to-steep", "dbt-to-steep"]
+IMPORT_SKILLS = ["ossie-to-steep", "snowflake-to-steep", "dbt-to-steep",
+                 "lookml-to-steep"]
 DUPLICATES = [
     tuple(f"plugins/steep/skills/{skill}/{path}" for skill in IMPORT_SKILLS)
     for path in ("scripts/validate_steep_import.py",

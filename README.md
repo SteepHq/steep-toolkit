@@ -13,6 +13,7 @@ Copilot, Cursor, or any other agent that supports the Agent Skills standard.
 | [steep-to-snowflake](plugins/steep/skills/steep-to-snowflake/) | **Experimental.** Export a Steep semantic model to a [Snowflake semantic view](https://docs.snowflake.com/en/user-guide/views-semantic/overview) as `CREATE SEMANTIC VIEW` DDL for Cortex Analyst and SQL users, with an offline validator and a report of what does not carry over. |
 | [snowflake-to-steep](plugins/steep/skills/snowflake-to-steep/) | **Experimental.** Import a [Snowflake semantic view](https://docs.snowflake.com/en/user-guide/views-semantic/overview) into Steep semantic model YAML: modules, dimensions, metrics and join paths, with a validator and a report of what does not carry over. Restores a `steep-to-snowflake` export. |
 | [dbt-to-steep](plugins/steep/skills/dbt-to-steep/) | **Experimental.** Import the [dbt Semantic Layer](https://docs.getdbt.com/docs/use-dbt-semantic-layer/dbt-sl) (MetricFlow) semantic models and metrics of a dbt project, in the latest or the legacy YAML spec, into Steep semantic model YAML: modules, dimensions, metrics and join paths, with a validator and a report of what does not carry over. |
+| [lookml-to-steep](plugins/steep/skills/lookml-to-steep/) | **Experimental.** Import the [LookML](https://cloud.google.com/looker/docs/what-is-lookml) views, explores and measures of a Looker project into Steep semantic model YAML: modules, dimensions, metrics and join paths, with a validator and a report of what does not carry over. |
 
 ## Install
 

@@ -24,6 +24,13 @@ plugins/steep/skills/steep-to-snowflake/references/semantic-view-syntax.md
   documentation on semantic views. It is not a copy of that documentation;
   the live documentation at https://docs.snowflake.com is authoritative.
 
+plugins/steep/skills/lookml-to-steep/references/mapping.md
+
+  Its filter expression tables summarise, in words written for this
+  repository, the public Looker documentation on filter expressions and
+  LookML parameters. They are not a copy of that documentation; the live
+  documentation at https://cloud.google.com/looker/docs is authoritative.
+
 -------------------------------------------------------------------------------
 Trademarks
 -------------------------------------------------------------------------------
@@ -31,6 +38,7 @@ Trademarks
 Snowflake, Cortex Analyst and Snowflake Intelligence are trademarks of
 Snowflake Inc. Apache, Apache Ossie and the Apache feather logo are trademarks
 of The Apache Software Foundation. dbt and MetricFlow are trademarks of
-dbt Labs, Inc. They are used here only to identify those products. This
-project is not affiliated with or endorsed by Snowflake Inc., The Apache
-Software Foundation or dbt Labs, Inc.
+dbt Labs, Inc. Looker and LookML are trademarks of Google LLC. They are used
+here only to identify those products. This project is not affiliated with or
+endorsed by Snowflake Inc., The Apache Software Foundation, dbt Labs, Inc. or
+Google LLC.
