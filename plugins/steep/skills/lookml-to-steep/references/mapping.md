@@ -245,15 +245,16 @@ warehouse.
 
 LookML measures do not say which time field they are measured over: in Looker,
 the user picks one at query time. Every Steep metric except `derived-ratio`
-needs exactly one. Pick it per measure, taking the first that applies:
+needs exactly one. Pick it per view, for all of the view's measures:
 
-1. A `period_over_period` measure whose `based_on` is this measure names a
-   time field in `based_on_time`. Use that group's column.
-2. The measure's view has exactly one time column candidate. Use it.
-3. Otherwise **ask**, once per view, listing its candidates. Suggest, in this
+1. The view has exactly one time column candidate. Use it.
+2. Otherwise **ask**, once per view, listing its candidates. Suggest, in this
    order: a field in an `always_filter` or `conditionally_filter` of the
    explore whose base view this is, then a group named `created`. Never pick
    one without asking.
+
+Do not take the time field from anything else in the project, such as a
+`period_over_period` measure's `based_on_time`.
 
 A view with no candidate cannot carry metrics. Report its measures, and ask
 whether a joined view's date should be added as a column of its table in the
@@ -358,7 +359,7 @@ that matches:
 | `number` | see [Number measures and ratios](#number-measures-and-ratios) | |
 | `string` (the default when `type` is missing), with an `e` that is a numeric aggregate (`SUM(…)`, `COUNT(…)`) | `custom-value` | `sql_expression: e` |
 | `percent_of_total`, `percent_of_previous`, `running_total` | nothing: Looker computes them after the query, over the rows shown. Skip and report. | |
-| `period_over_period` | nothing: Steep compares periods itself in reports. Skip and report; use its `based_on_time` (see [Metric `time`](#metric-time)). | |
+| `period_over_period` | nothing: Steep compares periods itself in reports. Skip and report. | |
 | `list`, `date`, `yesno`, other `string` | nothing: not a number. Skip and report. | |
 
 **`_distinct` measures** fix double counting when a join repeats rows. Steep

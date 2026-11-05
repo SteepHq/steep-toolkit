@@ -89,9 +89,8 @@ Follow `references/mapping.md` in this order:
 Rules that are easy to get wrong:
 
 - LookML measures do not name a time field. Every Steep metric except a
-  derived ratio needs one. Use the view's only candidate, or a
-  `period_over_period`'s `based_on_time`; otherwise ask. Never pick one
-  silently.
+  derived ratio needs one. Use the view's only date field; otherwise ask.
+  Never pick one silently.
 - A measure's identifier is its name only when no other imported measure has
   it. `count` in two views becomes `orders_count` and `users_count`.
 - `relationship` defaults to `many_to_one` and describes the view on the
