@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://api.steep.app/v1/code/schema
+module:
+  identifier: orders
+  schema: SALES
+  table: ORDERS
+  description: One row per order.
+  dimensions:
+    - column: STATUS
+      type: categorical
+    - column: CHANNEL
+      label: Sales channel
+      type: categorical
+  metrics:
+    - identifier: revenue
+      name: Revenue
+      type: sum
+      value: ORDERS.AMOUNT
+      time: ORDERS.ORDERED_AT
+      dimensions:
+        - this.*
+        - SALES.CUSTOMERS.*
+      filters:
+        - column: STATUS
+          operator: in
+          expression: paid,refunded
+      slices:
+        - name: Web
+          filter:
+            column: CHANNEL
+            operator: equals
+            expression: web
+    - identifier: smb_orders
+      name: SMB orders
+      type: count
+      time: ORDERS.ORDERED_AT
+      dimensions:
+        - this.*
+        - SALES.CUSTOMERS.*
+      filters:
+        - table: CUSTOMERS
+          column: SEGMENT
+          operator: equals
+          expression: smb
+    - identifier: revenue_per_customer
+      name: Revenue per customer
+      type: derived-ratio
+      numerator: revenue
+      denominator: new_customers
+      format: number
+    - identifier: web_revenue_share
+      name: Web revenue share
+      type: derived-ratio
+      numerator:
+        metric: revenue
+        slice: web
+      denominator: revenue
+      format: percentage

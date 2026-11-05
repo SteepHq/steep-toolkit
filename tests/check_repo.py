@@ -18,20 +18,21 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PLUGIN = "plugins/steep"
 
+IMPORT_SKILLS = ["ossie-to-steep", "snowflake-to-steep", "dbt-to-steep"]
 DUPLICATES = [
-    ("plugins/steep/skills/ossie-to-steep/scripts/validate_steep_import.py",
-     "plugins/steep/skills/snowflake-to-steep/scripts/validate_steep_import.py"),
-    ("plugins/steep/skills/ossie-to-steep/references/steep-module-schema.json",
-     "plugins/steep/skills/snowflake-to-steep/references/steep-module-schema.json"),
+    tuple(f"plugins/steep/skills/{skill}/{path}" for skill in IMPORT_SKILLS)
+    for path in ("scripts/validate_steep_import.py",
+                 "references/steep-module-schema.json")
 ]
 
 
 def main() -> int:
     errors: list[str] = []
 
-    for a, b in DUPLICATES:
-        if (ROOT / a).read_bytes() != (ROOT / b).read_bytes():
-            errors.append(f"{a} and {b} differ; they must stay identical")
+    for first, *others in DUPLICATES:
+        for other in others:
+            if (ROOT / first).read_bytes() != (ROOT / other).read_bytes():
+                errors.append(f"{first} and {other} differ; they must stay identical")
 
     plugin = json.loads((ROOT / PLUGIN / ".claude-plugin/plugin.json").read_text())
     marketplace = json.loads((ROOT / ".claude-plugin/marketplace.json").read_text())

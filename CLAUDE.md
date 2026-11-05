@@ -14,10 +14,11 @@ messages, branch names and PR text, is visible to anyone.
   reach installed copies.
 - Keep content customer-facing: no internal URLs, ticket ids, customer names,
   people's names or references to private repos or unreleased features.
-- `plugins/steep/skills/ossie-to-steep` and
-  `plugins/steep/skills/snowflake-to-steep` each carry an identical copy of
+- `plugins/steep/skills/ossie-to-steep`,
+  `plugins/steep/skills/snowflake-to-steep` and
+  `plugins/steep/skills/dbt-to-steep` each carry an identical copy of
   `references/steep-module-schema.json` and `scripts/validate_steep_import.py`,
-  so each skill works on its own when copied out. Change both copies together;
+  so each skill works on its own when copied out. Change all copies together;
   `tests/check_repo.py` enforces it.
 - Tests: `python3 tests/check_repo.py` and `python3 tests/run.py` (needs
   `pyyaml` and `jsonschema`). CI runs both on every PR. When you fix a

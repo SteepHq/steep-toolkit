@@ -21,12 +21,13 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TESTS = ROOT / "tests"
 
-# Each suite runs one or more validators. Both copies of the import validator
-# run against the same fixtures, so they cannot drift apart in behavior.
+# Each suite runs one or more validators. Every copy of the import validator
+# runs against the same fixtures, so they cannot drift apart in behavior.
 SUITES = {
     "steep-import": [
         ROOT / "plugins/steep/skills/ossie-to-steep/scripts/validate_steep_import.py",
         ROOT / "plugins/steep/skills/snowflake-to-steep/scripts/validate_steep_import.py",
+        ROOT / "plugins/steep/skills/dbt-to-steep/scripts/validate_steep_import.py",
     ],
     "ossie": [ROOT / "plugins/steep/skills/steep-to-ossie/scripts/validate_ossie.py"],
     "semantic-view": [ROOT / "plugins/steep/skills/steep-to-snowflake/scripts/validate_semantic_view.py"],
