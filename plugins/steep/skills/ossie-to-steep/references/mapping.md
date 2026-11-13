@@ -36,11 +36,12 @@ purpose (listed below), or named in the report. Never drop one silently.
   one, the Steep `name` is the metric name humanized: `_` becomes a space and
   the first letter is upper case (`total_revenue` → `Total revenue`).
 - **Key order** follows the order of the rows in the tables below, for restored
-  objects too ("verbatim" means the content, not the key order). A metric's
-  keys go: `identifier`, `name`, `description`, `synonyms`, `agent_instructions`,
+  objects too ("verbatim" means the content, not the key order). A metric's keys
+  go: `identifier`, `name`, `description`, `synonyms`, `agent_instructions`,
   `examples`, `type`, the type's fields (`value`, `distinct_on`, `numerator`,
-  `denominator`, `sql_expression`, `numerator_sql`, `denominator_sql`), `format`,
-  `currency`, `unit`, `decimals`, `time`, `dimensions`, `filters`, `slices`, then any other restored keys.
+  `denominator`, `sql_expression`, `numerator_sql`, `denominator_sql`),
+  `format`, `currency`, `unit`, `decimals`, `time`, `dimensions`, `filters`,
+  `slices`, then any other restored keys.
 - **Report** in the chat, not in a file, unless the user asks for one.
 
 ## Round trip: STEEP extensions

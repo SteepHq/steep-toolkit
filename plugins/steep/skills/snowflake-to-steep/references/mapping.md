@@ -56,8 +56,8 @@ on purpose (listed below), or named in the report. Never drop one silently.
   `agent_instructions`, `examples`, `type`, the type's fields (`value`,
   `distinct_on`, `numerator`, `denominator`, `sql_expression`, `numerator_sql`,
   `denominator_sql`), `format`, `currency`, `unit`, `decimals`, `time`,
-  `time_aggregation`, `dimensions`, `filters`, `slices`, `is_unlisted`. Modules and dimensions follow the order of
-  the rows in their tables below.
+  `time_aggregation`, `dimensions`, `filters`, `slices`, `is_unlisted`. Modules
+  and dimensions follow the order of the rows in their tables below.
 - **Report** in the chat, not in a file, unless the user asks for one.
 
 ## Views exported from Steep

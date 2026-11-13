@@ -96,9 +96,9 @@ Rules that are easy to get wrong:
   or not; the checker's "no 'format'" warning is expected for them. Write
   `format` explicitly on every ratio you build from an expression: Steep
   defaults to `percentage`.
-- Ossie has no currency or unit. Write `currency`, `unit` or `decimals` on a
-  new metric only when its name, description or `ai_context` states them. A ratio with a
-  `currency` needs `format: number`.
+- Ossie has no currency or unit. Write `currency`, `unit` or `decimals` on a new
+  metric only when its name, description or `ai_context` states them. A ratio
+  with a `currency` needs `format: number`.
 - One join path per pair of tables, single-column keys only. A duplicate fails
   the whole sync.
 - Never write `accessPolicies` (row-level security) except by restoring a STEEP

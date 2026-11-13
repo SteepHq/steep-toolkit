@@ -51,8 +51,9 @@ purpose (listed below), or named in the report. Never drop one silently.
 - **Key order** in a metric: `identifier`, `name`, `description`, `type`, the
   type's fields (`value`, `distinct_on`, `numerator`, `denominator`,
   `sql_expression`, `numerator_sql`, `denominator_sql`), `format`, `currency`,
-  `unit`, `decimals`, `time`, `time_aggregation`, `time_grains`, `dimensions`, `filters`, `slices`. Modules
-  and dimensions follow the order of the rows in their tables below.
+  `unit`, `decimals`, `time`, `time_aggregation`, `time_grains`, `dimensions`,
+  `filters`, `slices`. Modules and dimensions follow the order of the rows in
+  their tables below.
 - **Report** in the chat, not in a file, unless the user asks for one.
 
 ## Reading the input

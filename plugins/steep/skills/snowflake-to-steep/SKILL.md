@@ -55,8 +55,9 @@ output.
    `Steep identifiers:`, `Format per metric:` or `Display names:` line, the
    view came from Steep
    (a `steep-to-snowflake` export). The mapping restores time columns,
-   identifiers, formats and currencies, display names, slices and join paths from it. Metric
-   names that use `<metric>__<slice>` are slice candidates in any view.
+   identifiers, formats, currencies, units, decimals, display names, slices
+   and join paths from it. Metric names that use `<metric>__<slice>` are slice
+   candidates in any view.
 3. Look for an existing Steep repo: `*.yml` / `*.yaml` files whose root key is
    `module` or `targets`. If there is one, the import adds to it (step 3).
 4. Ask only for what the view cannot tell you, with these defaults:
@@ -109,8 +110,8 @@ Rules that are easy to get wrong:
 - Steep applies `filters` to the whole metric. Use them only when the same
   predicate filters every aggregate in the expression.
 - Write `format` on every ratio. Steep defaults to `percentage`.
-- Write `currency`, `unit` or `decimals` only from a `Format per metric`
-  entry, or when the metric's name, comment or synonyms state them. A ratio with a
+- Write `currency`, `unit` or `decimals` only from a `Format per metric` entry,
+  or when the metric's name, comment or synonyms state them. A ratio with a
   `currency` needs `format: number`.
 - The marker lines (`Time dimension per metric`, `Steep identifiers`,
   `Format per metric`, `Display names`) fill fields. Never copy them into `agent_instructions`.

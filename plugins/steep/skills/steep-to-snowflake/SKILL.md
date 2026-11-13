@@ -71,7 +71,7 @@ Follow `references/mapping.md` in this order:
    column that has no dimension.
 6. **METRICS**: one per metric and one per slice, with filters folded into the
    aggregate. Derived ratios become derived metrics without a table prefix.
-7. `COMMENT`, then `AI_SQL_GENERATION` with the agent instructions and three
+7. `COMMENT`, then `AI_SQL_GENERATION` with the agent instructions and four
    marker lines for the import: `Time dimension per metric`, `Steep
    identifiers`, `Format per metric` and `Display names`.
 

@@ -335,7 +335,8 @@ def check_slices(metric: dict, where: str, findings) -> None:
 
 def check_currency_and_unit(metric: dict, where: str, findings) -> None:
     """Flags a currency or unit that Steep drops because the format or the other one rules it out."""
-    currency, unit = metric.get("currency"), metric.get("unit")
+    # Steep trims the unit and treats a blank one as none.
+    currency, unit = metric.get("currency"), (metric.get("unit") or "").strip()
     default = "percentage" if metric["type"] in RATIO_TYPES else "number"
     if metric.get("format", default) == "percentage":
         if currency:
