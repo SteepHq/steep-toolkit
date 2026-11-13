@@ -1,0 +1,37 @@
+# Currencies and units that Steep drops: a ratio with a currency but its default
+# percentage format, a percentage with a unit, and a unit beside a currency.
+module:
+  identifier: payments
+  schema: steep_demo
+  table: fact_payments
+
+  dimensions:
+    - column: created_at
+      label: Created at
+      type: time
+
+  metrics:
+    - identifier: payment_volume
+      name: Payment volume
+      type: sum
+      time: fact_payments.created_at
+      value: fact_payments.amount
+      currency: EUR
+      unit: k
+
+    - identifier: average_payment
+      name: Average payment
+      type: ratio
+      time: fact_payments.created_at
+      numerator: fact_payments.amount
+      denominator: fact_payments.quantity
+      currency: USD
+
+    - identifier: refund_share
+      name: Refund share
+      type: custom-ratio
+      time: fact_payments.created_at
+      numerator_sql: SUM(fact_payments.refunded_amount)
+      denominator_sql: SUM(fact_payments.amount)
+      format: percentage
+      unit: pp

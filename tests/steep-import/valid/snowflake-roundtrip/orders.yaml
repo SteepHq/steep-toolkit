@@ -22,6 +22,7 @@ module:
       agent_instructions: Excludes cancelled orders.
       type: sum
       value: ORDERS.AMOUNT
+      currency: USD
       time: ORDERS.CREATED_AT
       dimensions:
         - this.*
@@ -54,3 +55,4 @@ module:
       numerator: revenue
       denominator: new-customers
       format: number
+      currency: USD

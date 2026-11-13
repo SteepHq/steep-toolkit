@@ -55,8 +55,9 @@ output.
    `Steep identifiers:`, `Format per metric:` or `Display names:` line, the
    view came from Steep
    (a `steep-to-snowflake` export). The mapping restores time columns,
-   identifiers, formats, display names, slices and join paths from it. Metric
-   names that use `<metric>__<slice>` are slice candidates in any view.
+   identifiers, formats, currencies, units, decimals, display names, slices
+   and join paths from it. Metric names that use `<metric>__<slice>` are slice
+   candidates in any view.
 3. Look for an existing Steep repo: `*.yml` / `*.yaml` files whose root key is
    `module` or `targets`. If there is one, the import adds to it (step 3).
 4. Ask only for what the view cannot tell you, with these defaults:
@@ -109,6 +110,9 @@ Rules that are easy to get wrong:
 - Steep applies `filters` to the whole metric. Use them only when the same
   predicate filters every aggregate in the expression.
 - Write `format` on every ratio. Steep defaults to `percentage`.
+- Write `currency`, `unit` or `decimals` only from a `Format per metric` entry,
+  or when the metric's name, comment or synonyms state them. A ratio with a
+  `currency` needs `format: number`.
 - The marker lines (`Time dimension per metric`, `Steep identifiers`,
   `Format per metric`, `Display names`) fill fields. Never copy them into `agent_instructions`.
 - One join path per pair of tables, single-column keys only. A duplicate fails
@@ -150,6 +154,7 @@ across files.
   - duplicate module, metric, entity, slice and dimension identifiers;
   - two modules on one table, and duplicate join paths;
   - derived-ratio operands and metric dimensions that do not resolve.
+  - a `currency` or `unit` that Steep drops: on a percentage, or both together.
   - a `targets:` file that is not exactly one `{schema, table}` object.
 - **Warnings** for likely import mistakes:
   - a file without the schema line;
@@ -171,7 +176,8 @@ End with a short import report:
 
 - Counts: modules, dimensions, metrics by `type`, slices, join paths.
 - **Needs a decision**: time columns you could not choose, ratios whose
-  `format` you guessed, dimension types you could not read (DDL input).
+  `format` you guessed, money metrics whose currency nothing states, dimension
+  types you could not read (DDL input).
 - **Not imported**, each with the Snowflake name and why. This covers
   everything under "Not representable in Steep" in the mapping that the view
   uses.
