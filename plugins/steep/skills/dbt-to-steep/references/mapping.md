@@ -50,8 +50,8 @@ purpose (listed below), or named in the report. Never drop one silently.
   not, translate only what you are sure of, and skip and report the rest.
 - **Key order** in a metric: `identifier`, `name`, `description`, `type`, the
   type's fields (`value`, `distinct_on`, `numerator`, `denominator`,
-  `sql_expression`, `numerator_sql`, `denominator_sql`), `format`, `time`,
-  `time_aggregation`, `time_grains`, `dimensions`, `filters`, `slices`. Modules
+  `sql_expression`, `numerator_sql`, `denominator_sql`), `format`, `currency`,
+  `unit`, `decimals`, `time`, `time_aggregation`, `time_grains`, `dimensions`, `filters`, `slices`. Modules
   and dimensions follow the order of the rows in their tables below.
 - **Report** in the chat, not in a file, unless the user asks for one.
 
@@ -411,6 +411,18 @@ are fractions, and Steep renders `percentage` as the fraction × 100. Use
 `%`, conversion or churn, else `number`. Steep defaults to `percentage`, so
 always write it, and list every ratio under "Needs a decision".
 
+**`currency`, `unit` and `decimals`**, on any metric type: dbt has no field for
+them, so write them only when the metric's name, label, description or
+`config.meta` states them.
+
+- `currency` is an ISO 4217 code, such as `USD`: write it for `revenue_usd` or
+  "Order value in EUR". A word like revenue or price alone does not say which
+  currency: leave it out and list the metric under "Needs a decision". A ratio
+  with a currency also needs `format: number`.
+- `unit` is a label of at most three characters, such as `ms`, `s` or `kB`, for
+  a plain number. Never write it with a `currency` or on a `percentage`.
+- `decimals` (0 to 6) only when the source fixes the decimal places.
+
 Place a ratio on the numerator's module, after that module's other metrics. A
 derived ratio computes each operand on its own module and time column, then
 divides. Report every derived ratio whose operands' `time` columns differ.
@@ -761,6 +773,8 @@ Report items for this example:
   columns.
 - Formats guessed: `revenue_per_customer` → `number`, `web_revenue_share` →
   `percentage`.
+- `revenue` and `revenue_per_customer` are money, but nothing says which
+  currency: ask, then add `currency`.
 - `revenue` keeps a `CHANNEL` group only if it has paid or refunded orders.
 - `STATUS`, `CHANNEL` and `SEGMENT` are `categorical`; confirm if one holds
   country codes.

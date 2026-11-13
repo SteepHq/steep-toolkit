@@ -40,7 +40,9 @@ both before writing any output.
    Ignore `targets:` documents and list them in the report. If the user has no
    files but the Steep MCP server is connected, rebuild the same information
    with `list_modules`, `list_metrics`, `get_metric` and `list_entities`. Say in
-   the report that the export came from the API.
+   the report that the export came from the API. The API returns a metric's
+   `format` but not its `currency`, `unit` or `decimals`: report them as not
+   carried over.
 2. Ask only for what the files cannot tell you, with these defaults:
    - **View name**: default is the repo or folder name, sanitized.
    - **Where the view lives**: `database.schema`. There is no default; ask.

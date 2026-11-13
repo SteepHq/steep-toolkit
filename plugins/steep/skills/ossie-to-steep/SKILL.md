@@ -96,6 +96,9 @@ Rules that are easy to get wrong:
   or not; the checker's "no 'format'" warning is expected for them. Write
   `format` explicitly on every ratio you build from an expression: Steep
   defaults to `percentage`.
+- Ossie has no currency or unit. Write `currency`, `unit` or `decimals` on a
+  new metric only when its name, description or `ai_context` states them. A ratio with a
+  `currency` needs `format: number`.
 - One join path per pair of tables, single-column keys only. A duplicate fails
   the whole sync.
 - Never write `accessPolicies` (row-level security) except by restoring a STEEP
@@ -129,8 +132,9 @@ Pass the whole Steep folder, not just the new files, so it can find duplicates
 across files. The checker validates every module file against the bundled JSON
 Schema, then checks the rules that fail a Steep sync: duplicate module, metric,
 entity, slice and dimension identifiers, two modules on one table, duplicate join
-paths, derived-ratio operands and metric dimensions that do not resolve, and a
-`targets:` file that is not exactly one `{schema, table}` object. It also
+paths, derived-ratio operands and metric dimensions that do not resolve, a
+`currency` or `unit` that Steep drops (on a percentage, or both together), and
+a `targets:` file that is not exactly one `{schema, table}` object. It also
 warns about likely import mistakes: a file without the schema line, a ratio
 without `format` (expected for a
 restored metric that had none), `FILTER (WHERE` in custom SQL, or a column on a
@@ -150,7 +154,8 @@ End with a short import report:
 - Counts: modules, dimensions, metrics by `type`, join paths, and how many came
   back from STEEP extensions.
 - **Needs a decision**: time columns you could not choose, ratios whose `format`
-  you guessed, access policies waiting for approval.
+  you guessed, money metrics whose currency the source does not state, access
+  policies waiting for approval.
 - **Not imported**, each with the Ossie name and why: query sources, metrics
   without an aggregate or with only other dialects, composite or duplicate
   relationships, dropped databases, model-level `description` and `ai_context`,

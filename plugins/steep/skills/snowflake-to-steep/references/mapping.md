@@ -55,8 +55,8 @@ on purpose (listed below), or named in the report. Never drop one silently.
 - **Key order** in a metric: `identifier`, `name`, `description`, `synonyms`,
   `agent_instructions`, `examples`, `type`, the type's fields (`value`,
   `distinct_on`, `numerator`, `denominator`, `sql_expression`, `numerator_sql`,
-  `denominator_sql`), `format`, `time`, `time_aggregation`, `dimensions`,
-  `filters`, `slices`, `is_unlisted`. Modules and dimensions follow the order of
+  `denominator_sql`), `format`, `currency`, `unit`, `decimals`, `time`,
+  `time_aggregation`, `dimensions`, `filters`, `slices`, `is_unlisted`. Modules and dimensions follow the order of
   the rows in their tables below.
 - **Report** in the chat, not in a file, unless the user asks for one.
 
@@ -71,7 +71,7 @@ Snowflake names case-insensitively:
 | --- | --- |
 | `Time dimension per metric:` | each metric's `time`: the column behind the named dimension |
 | `Steep identifiers:` | the identifier of each named metric, slice (by its slice metric), dimension and derived metric; `table <alias> → <identifier>` names a module |
-| `Format per metric:` | the `format` of each named ratio |
+| `Format per metric:` | the `format` of each named metric, and its `currency`, `unit` and `decimals` when the entry lists them (`number, currency USD, decimals 0`). An older export lists only ratios, with the format alone. |
 | `Display names:` | the `label` of each named module (`table <alias> → <label>`) and dimension, and the `name` of each named metric |
 
 Any of these lines means the view came from Steep, which also decides how
@@ -210,7 +210,8 @@ The module is the metric's table.
 | `time_aggregation` | `last-date` from `non_additive_dimensions`, see the expression table |
 | `dimensions` | `this.*` when the module has dimensions, then `<schema>.<table>.*` for each module the metric's table reaches by following relationships from left table to right table (transitively, and both ways across a one-to-one), when that module has dimensions. These are the breakdowns Snowflake allows. Omit when empty. |
 | `filters` | see [Predicates → filters](#predicates--filters) |
-| `format` | on `ratio`, `custom-ratio` and `derived-ratio`, always written: the `Format per metric` entry, else `percentage` when the expression multiplied by 100 (drop the factor), else `number`. Steep defaults to `percentage`. |
+| `format` | on `ratio`, `custom-ratio` and `derived-ratio`, always written: the `Format per metric` entry, else `percentage` when the expression multiplied by 100 (drop the factor), else `number`. Steep defaults to `percentage`. On other types, write it only when the entry says `percentage`. |
+| `currency`, `unit`, `decimals` | from the `Format per metric` entry. Without one, write a `currency` (ISO 4217 code), a `unit` (at most three characters) or `decimals` (0 to 6) only when the metric's name, comment or synonyms state it, such as `REVENUE_USD` or `LATENCY_MS`, and report money metrics whose currency nothing states. A ratio with a currency needs `format: number`; never write a unit with a currency or on a percentage. |
 | `is_unlisted` | `true` for a private metric imported only as a derived-ratio operand |
 
 **Private metrics** (`private_access`) are helpers. Import one only when a
@@ -523,7 +524,7 @@ module_custom_instructions:
     orders.revenue: Excludes cancelled orders.
     Time dimension per metric: orders.revenue → orders.created_at; orders.revenue__web → orders.created_at; orders.smb_orders → orders.created_at; customers.new_customers → customers.created_at; customers.total_balance → customers.snapshot_date
     Steep identifiers: orders.smb_orders → smb-orders; revenue_per_customer → revenue-per-customer; customers.new_customers → new-customers; customers.total_balance → total-balance
-    Format per metric: revenue_per_customer → number
+    Format per metric: orders.revenue → number, currency USD; revenue_per_customer → number, currency USD
     Display names: table customers → Customers; orders.country → Country; orders.smb_orders → SMB orders
 ```
 
@@ -535,8 +536,8 @@ Steep, `modules/orders.yaml`:
   so it comes back as a slice. Its name comes from the comment, and its
   identifier is left out because `web` is what Steep generates from `Web`.
 - `SMB_ORDERS`, `REVENUE_PER_CUSTOMER` and the operand `NEW_CUSTOMERS` take
-  their identifiers from `Steep identifiers`, and the ratio its `format` from
-  `Format per metric`.
+  their identifiers from `Steep identifiers`. `REVENUE` takes its currency,
+  and the ratio its `format` and currency, from `Format per metric`.
 - Metric `dimensions` are this module's and those of `CUSTOMERS`, which
   `ORDERS` reaches through the relationship.
 - `NET_REVENUE` is custom SQL, because `NET_AMOUNT` is computed. It has no time
@@ -565,6 +566,7 @@ module:
       agent_instructions: Excludes cancelled orders.
       type: sum
       value: ORDERS.AMOUNT
+      currency: USD
       time: ORDERS.CREATED_AT
       dimensions:
         - this.*
@@ -605,6 +607,7 @@ module:
       numerator: revenue
       denominator: new-customers
       format: number
+      currency: USD
 ```
 
 Without `net_revenue`, this is the `orders` module the export started from.

@@ -26,7 +26,7 @@ The agent reads your Steep semantic model YAML (`module:` files) and writes one
 | Derived ratio | Derived metric |
 | `last-date` (snapshot) metric | Metric with `NON ADDITIVE BY` |
 | Synonyms, descriptions | `WITH SYNONYMS`, `COMMENT` |
-| Agent instructions, labels and metric names, and each metric's date, Steep identifier and format | `AI_SQL_GENERATION` |
+| Agent instructions, labels and metric names, and each metric's date, Steep identifier, format and currency | `AI_SQL_GENERATION` |
 
 It then validates the statement offline and reports what Snowflake cannot
 represent. If you have Snowflake access, it can also create the view in a
@@ -86,7 +86,7 @@ It cannot see your tables, so run the statement in a scratch schema too.
   targets** have no Snowflake equivalent, and are listed in the report.
 - **A near round trip.** The `snowflake-to-steep` skill restores an export,
   using marker lines in `AI_SQL_GENERATION` for each metric's date, Steep
-  identifier and format, and for display names. Still different after the
+  identifier, format, currency, unit and decimals, and for display names. Still different after the
   round trip: entities are lost (their property columns come back as ordinary
   dimensions, and the primary key is not restored as an entity unless you ask),
   dimension types come back as `categorical`, allowed dimensions as every

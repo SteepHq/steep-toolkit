@@ -40,7 +40,7 @@ purpose (listed below), or named in the report. Never drop one silently.
   keys go: `identifier`, `name`, `description`, `synonyms`, `agent_instructions`,
   `examples`, `type`, the type's fields (`value`, `distinct_on`, `numerator`,
   `denominator`, `sql_expression`, `numerator_sql`, `denominator_sql`), `format`,
-  `time`, `dimensions`, `filters`, `slices`, then any other restored keys.
+  `currency`, `unit`, `decimals`, `time`, `dimensions`, `filters`, `slices`, then any other restored keys.
 - **Report** in the chat, not in a file, unless the user asks for one.
 
 ## Round trip: STEEP extensions
@@ -228,7 +228,10 @@ model-scoped metric goes on its **base** module:
 | `time` | see [below](#metric-time) |
 | `dimensions` | the dimension `column`s (not identifiers) of the base module, listed explicitly; omit when it has none. Dimensions of joined modules are allowed as `table.column` but are not added by default. |
 | `filters` | see [Predicates → filters](#predicates--filters) |
-| `format` | on new `ratio`, `custom-ratio` and `derived-ratio` metrics, always written (a restored metric keeps its extension as is): `percentage` when the expression multiplies by 100 (drop the factor), else `number`. Steep defaults to `percentage`, which would show `0.25` as 25 %. |
+| `format` | on new `ratio`, `custom-ratio` and `derived-ratio` metrics, always written (a restored metric keeps its extension as is): `percentage` when the expression multiplies by 100 (drop the factor) or the name, description or `ai_context` says rate, share, percent, `%`, conversion or churn, else `number`. Steep defaults to `percentage`, which would show `0.25` as 25 %. |
+| `currency` | on any new metric whose name, description or `ai_context` states the currency, such as `revenue_usd` or "in EUR": its ISO 4217 code. A word like revenue alone does not say which currency: leave it out and report the metric. A ratio with a currency needs `format: number`. |
+| `unit` | on a new plain-number metric whose name, description or `ai_context` states a short unit, such as a metric `avg_latency_ms` → `ms`: at most three characters. A column name alone does not count. Never with a `currency` or on a `percentage`. |
+| `decimals` | 0 to 6, only when the description or `ai_context` states the decimal places |
 | `slices` | STEEP extension only |
 
 `datatype` has no Steep slot (Steep returns every metric as a float). Do not

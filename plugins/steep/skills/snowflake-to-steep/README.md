@@ -26,7 +26,8 @@ The agent reads the semantic view and writes one `module:` file per table:
 | Synonyms, descriptions, custom instructions, verified questions | `synonyms`, `description`, `agent_instructions`, `examples` |
 
 It restores a `steep-to-snowflake` export nearly as it was: identifiers,
-display names, slices, join paths, and each metric's time column and format,
+display names, slices, join paths, and each metric's time column, format and
+currency,
 read from marker lines the export writes. Still lost on that round trip:
 access policies, private metrics, cohorts, time grains, owners, categories,
 examples, unlisted flags and targets; entities are lost (their property

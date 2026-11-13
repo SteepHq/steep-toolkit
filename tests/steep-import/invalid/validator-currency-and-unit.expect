@@ -1,0 +1,3 @@
+metric payment_volume: has currency 'EUR', so Steep drops unit 'k'
+metric average_payment: shown as a percentage, so Steep drops currency 'USD'
+metric refund_share: shown as a percentage, so Steep drops unit 'pp'

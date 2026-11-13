@@ -248,6 +248,7 @@ def check_model(modules, targets, findings) -> None:
             metrics.setdefault(metric["identifier"], (path, module, metric))
             all_metrics.append((path, module, metric))
             check_slices(metric, metric_where, findings)
+            check_currency_and_unit(metric, metric_where, findings)
 
         for entity in module.get("entities", []):
             entity_where = f"{path} entity {entity['identifier']}"
@@ -330,6 +331,22 @@ def check_slices(metric: dict, where: str, findings) -> None:
         if identifier in identifiers:
             findings.append(("FATAL", where, f"slice identifier '{identifier}' is declared twice"))
         identifiers.add(identifier)
+
+
+def check_currency_and_unit(metric: dict, where: str, findings) -> None:
+    """Flags a currency or unit that Steep drops because the format or the other one rules it out."""
+    currency, unit = metric.get("currency"), metric.get("unit")
+    default = "percentage" if metric["type"] in RATIO_TYPES else "number"
+    if metric.get("format", default) == "percentage":
+        if currency:
+            findings.append(
+                ("ERROR", where, f"shown as a percentage, so Steep drops currency '{currency}'. "
+                 "Write format: number to show it in that currency (ratios default to percentage)")
+            )
+        if unit:
+            findings.append(("ERROR", where, f"shown as a percentage, so Steep drops unit '{unit}'"))
+    elif currency and unit:
+        findings.append(("ERROR", where, f"has currency '{currency}', so Steep drops unit '{unit}'; keep one"))
 
 
 def slice_identifier(slice_: dict) -> str:
