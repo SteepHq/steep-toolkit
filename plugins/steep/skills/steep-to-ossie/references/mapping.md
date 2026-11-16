@@ -245,7 +245,8 @@ at. Write no relationship; put the original join path, verbatim, in the
   extension; their columns still become fields.
 - Metric `dimensions` (allowed breakdowns), `category`, `owner_emails`,
   `is_private`, `is_unlisted`, `time`, `time_grains`, `time_resampling`,
-  `time_aggregation: last-date`, `cohort`, `cohorts_only`, `format`.
+  `time_aggregation: last-date`, `cohort`, `cohorts_only`, `format`, `currency`,
+  `unit`, `decimals`.
 - Module `label`, `identifier`, `schema` and `table`, dimension `identifier` and
   `type`.
 - Join paths to tables that are not a module.

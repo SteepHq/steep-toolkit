@@ -35,5 +35,5 @@ CREATE OR ALTER SEMANTIC VIEW ANALYTICS.SEMANTIC.ACME
   AI_SQL_GENERATION 'orders.revenue: Excludes cancelled orders.
 Time dimension per metric: orders.revenue → orders.created_at; orders.revenue__web → orders.created_at; orders.smb_orders → orders.created_at; customers.new_customers → customers.created_at; customers.total_balance → customers.snapshot_date
 Steep identifiers: orders.smb_orders → smb-orders; revenue_per_customer → revenue-per-customer; customers.new_customers → new-customers; customers.total_balance → total-balance
-Format per metric: revenue_per_customer → number
+Format per metric: orders.revenue → number, currency USD; revenue_per_customer → number, currency USD
 Display names: table customers → Customers; orders.country → Country; orders.smb_orders → SMB orders';

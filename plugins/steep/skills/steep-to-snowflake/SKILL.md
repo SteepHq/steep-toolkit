@@ -40,7 +40,9 @@ both before writing any output.
    Ignore `targets:` documents and list them in the report. If the user has no
    files but the Steep MCP server is connected, rebuild the same information
    with `list_modules`, `list_metrics`, `get_metric` and `list_entities`. Say in
-   the report that the export came from the API.
+   the report that the export came from the API. The API returns a metric's
+   `format` but not its `currency`, `unit` or `decimals`: report them as not
+   carried over.
 2. Ask only for what the files cannot tell you, with these defaults:
    - **View name**: default is the repo or folder name, sanitized.
    - **Where the view lives**: `database.schema`. There is no default; ask.
@@ -69,7 +71,7 @@ Follow `references/mapping.md` in this order:
    column that has no dimension.
 6. **METRICS**: one per metric and one per slice, with filters folded into the
    aggregate. Derived ratios become derived metrics without a table prefix.
-7. `COMMENT`, then `AI_SQL_GENERATION` with the agent instructions and three
+7. `COMMENT`, then `AI_SQL_GENERATION` with the agent instructions and four
    marker lines for the import: `Time dimension per metric`, `Steep
    identifiers`, `Format per metric` and `Display names`.
 

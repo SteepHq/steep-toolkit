@@ -1,0 +1,51 @@
+# Display settings: a currency on a sum and on a money ratio (which needs
+# format: number, since ratios default to percentage), a unit and decimals.
+module:
+  identifier: payments
+  schema: steep_demo
+  table: fact_payments
+  label: Payments
+
+  dimensions:
+    - column: created_at
+      label: Created at
+      type: time
+
+  metrics:
+    - identifier: payment_volume
+      name: Payment volume
+      type: sum
+      value: fact_payments.amount
+      time: fact_payments.created_at
+      currency: USD
+      decimals: 0
+
+    - identifier: payments
+      name: Payments
+      type: count
+      time: fact_payments.created_at
+
+    - identifier: average_payment
+      name: Average payment
+      type: derived-ratio
+      numerator: payment_volume
+      denominator: payments
+      format: number
+      currency: USD
+      decimals: 2
+
+    - identifier: average_latency
+      name: Average latency
+      type: custom-value
+      sql_expression: AVG(fact_payments.latency_ms)
+      time: fact_payments.created_at
+      unit: ms
+
+    - identifier: refund_rate
+      name: Refund rate
+      type: custom-ratio
+      numerator_sql: SUM(CASE WHEN fact_payments.refunded THEN 1 ELSE 0 END)
+      denominator_sql: COUNT(*)
+      time: fact_payments.created_at
+      format: percentage
+      decimals: 1

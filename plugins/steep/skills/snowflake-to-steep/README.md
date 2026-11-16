@@ -25,16 +25,16 @@ The agent reads the semantic view and writes one `module:` file per table:
 | Relationship | Join path |
 | Synonyms, descriptions, custom instructions, verified questions | `synonyms`, `description`, `agent_instructions`, `examples` |
 
-It restores a `steep-to-snowflake` export nearly as it was: identifiers,
-display names, slices, join paths, and each metric's time column and format,
-read from marker lines the export writes. Still lost on that round trip:
-access policies, private metrics, cohorts, time grains, owners, categories,
-examples, unlisted flags and targets; entities are lost (their property
-columns come back as ordinary dimensions, and an entity is built only if you
-ask), dimension types come back as `categorical`, allowed dimensions as every reachable one,
-and filters on custom SQL stay inside the SQL. It then validates the files
-against Steep's schema and sync rules, and reports what Steep cannot
-represent.
+It restores a `steep-to-snowflake` export nearly as it was: identifiers, display
+names, slices, join paths, and each metric's time column, format, currency, unit
+and decimals, read from marker lines the export writes. Still lost on that round
+trip: access policies, private metrics, cohorts, time grains, owners,
+categories, examples, unlisted flags and targets; entities are lost (their
+property columns come back as ordinary dimensions, and an entity is built only
+if you ask), dimension types come back as `categorical`, allowed dimensions as
+every reachable one, and filters on custom SQL stay inside the SQL. It then
+validates the files against Steep's schema and sync rules, and reports what
+Steep cannot represent.
 
 Every file it writes starts with
 `# yaml-language-server: $schema=https://api.steep.app/v1/code/schema`, so

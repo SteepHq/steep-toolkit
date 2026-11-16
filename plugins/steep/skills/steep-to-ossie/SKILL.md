@@ -43,7 +43,8 @@ output.
 2. If the user has no files but the Steep MCP server is connected, rebuild the
    model with `list_modules`, `list_metrics`, `get_metric` and `list_entities`.
    The API returns what Steep stored, not the YAML: it may lack access policies,
-   join paths, the targets table and column paths exactly as written, and its
+   join paths, the targets table, metric `currency`, `unit` and `decimals`, and
+   column paths exactly as written, and its
    values can differ in form from the files. Extensions built from it are
    therefore not verbatim. Add `"source": "api"` to the root STEEP extension so
    an importer treats them with care, and list in the report what the API did
@@ -128,7 +129,9 @@ End with a short conversion report:
     only, no relationship),
   - derived ratios with `filters` (assumed to apply to both operands; unverified, so check parity),
   - cohorts, time grains, resampling, `last-date` aggregation, entities and
-    `targets:` files.
+    `targets:` files,
+  - metric formats, currencies, units and decimals: Ossie has no display
+    settings, so only the STEEP extension keeps them.
 - Assumptions you made (model name, database, warehouse).
 - When built from the API: that the extensions are not verbatim, and what the
   API did not provide.

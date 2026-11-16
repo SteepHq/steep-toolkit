@@ -2,12 +2,13 @@
 
 Steep side: the `module:` document of the Steep semantic model YAML
 (<https://help.steep.app/setup-and-manage/code-reference>). Snowflake side: the
-`CREATE SEMANTIC VIEW` subset in [`semantic-view-syntax.md`](semantic-view-syntax.md).
-Snowflake has no vendor-extension slot. Three structured lines in
-`AI_SQL_GENERATION` carry what the `snowflake-to-steep` skill needs to restore
-each metric's time column, identifier and format, so the round trip is close
-but not exact: see [Round trip](#round-trip). Never drop a Steep property
-silently: it is either mapped or listed in the report.
+`CREATE SEMANTIC VIEW` subset in
+[`semantic-view-syntax.md`](semantic-view-syntax.md). Snowflake has no
+vendor-extension slot. Four marker lines in `AI_SQL_GENERATION` carry what
+the `snowflake-to-steep` skill needs to restore each metric's time column,
+identifier, format, currency, unit and decimals, so the round trip is close but
+not exact: see [Round trip](#round-trip). Never drop a Steep property silently:
+it is either mapped or listed in the report.
 
 ## Conventions
 
@@ -185,8 +186,9 @@ null when `F` is false. This matches Steep, which applies the filters in
 | `custom-ratio`   | `(numerator_sql) / NULLIF((denominator_sql), 0)`, each rewritten                             |
 | `derived-ratio`  | a **derived metric**, see below                                                              |
 
-- `format: percentage` is display only. Do not multiply by 100. The format of
-  every ratio goes in the `Format per metric` line instead.
+- `format: percentage` is display only. Do not multiply by 100. A metric's
+  `format`, `currency`, `unit` and `decimals` go in the `Format per metric`
+  line instead.
 - **`time_aggregation: last-date`** → add
   `NON ADDITIVE BY (<alias>.<time column>_day ASC NULLS FIRST)` before `AS`.
   Steep takes each group's value on its latest day, and Snowflake's
@@ -293,10 +295,15 @@ Build it as plain lines, in this order, leaving out empty parts:
    `table <alias> → <module identifier>`; everything else by its qualified
    Snowflake name (`orders.smb_orders`, or the bare name of a derived metric).
    Leave the line out when it would be empty.
-6. `Format per metric: <metric> → <format>; …` for every `ratio`,
-   `custom-ratio` and `derived-ratio`: its Steep `format`, else `percentage`
-   (Steep's default). Slices inherit their parent's. Leave the line out when
-   there is no ratio.
+6. `Format per metric: <metric> → <spec>; …` for every `ratio`, `custom-ratio`
+   and `derived-ratio`, and every other metric that has a `format`, `currency`,
+   `unit` or `decimals`. `<spec>` is its Steep `format`, else the type's default
+   (`percentage` for the three ratio types, `number` otherwise), then
+   `, currency <code>`, `, unit <unit>` and `, decimals <n>` for each it has,
+   in that order: `orders.revenue → number, currency USD, decimals 0`. Slices
+   inherit their parent's. A unit containing `,`, `;` or `→` cannot be written
+   here: leave the unit out and report it. Leave the line out when it would be
+   empty.
 7. `Display names: <Snowflake name> → <display name>; …` for the display names
    listed in Conventions. Write a module as `table <alias> → <label>`. A display
    name containing `;` or `→` cannot be written here: leave it out and report
@@ -310,8 +317,9 @@ this order, after all text lines.
 
 The `snowflake-to-steep` skill restores an export from its DDL or YAML: modules,
 dimensions, metrics with their identifiers, names, time columns, formats,
-filters and snapshots, slices, derived ratios, and join paths with their type
-and declaring module. What still comes back different:
+currencies, units, decimals, filters and snapshots, slices, derived ratios, and
+join paths with their type and declaring module. What still comes back
+different:
 
 - **Entities** are lost. The export writes the entity's primary key as
   `PRIMARY KEY` and its property columns as dimensions; its identifier, name,
@@ -329,7 +337,10 @@ and declaring module. What still comes back different:
   plus each joined module on the one side).
 - **Filters on custom SQL** stay folded into the SQL (`IFF` inside each
   aggregate).
-- **Derived ratios** come back on their numerator's module.
+- **Derived ratios** come back on their numerator's module, after its other
+  metrics.
+- **`format: number`** written on a metric that is not a ratio comes back left
+  out: it is that type's default.
 - **Labels** identical to Steep's default (a dimension's column, a module's
   identifier) come back omitted.
 - Joins dropped on export (non-module, self, cyclic) and metrics left out.
@@ -379,6 +390,7 @@ module:
       agent_instructions: Excludes cancelled orders.
       type: sum
       value: ORDERS.AMOUNT
+      currency: USD
       time: ORDERS.CREATED_AT
       dimensions: [this.*, SALES.CUSTOMERS.*]
       filters:
@@ -404,6 +416,7 @@ module:
       numerator: revenue
       denominator: new-customers
       format: number
+      currency: USD
 ```
 
 ```yaml
@@ -461,7 +474,7 @@ Snowflake, with the view in `ANALYTICS.SEMANTIC` and the tables in database
   `customers_to_orders`. No `FACTS` clause is needed, because every
   cross-table column already has a dimension.
 - `Steep identifiers` lists the metrics whose identifiers have a `-`, and
-  `Format per metric` the one ratio.
+  `Format per metric` the one ratio and the currency of `revenue`.
 
 ```sql
 CREATE OR ALTER SEMANTIC VIEW ANALYTICS.SEMANTIC.ACME
@@ -499,7 +512,7 @@ CREATE OR ALTER SEMANTIC VIEW ANALYTICS.SEMANTIC.ACME
   AI_SQL_GENERATION 'orders.revenue: Excludes cancelled orders.
 Time dimension per metric: orders.revenue → orders.created_at; orders.revenue__web → orders.created_at; orders.smb_orders → orders.created_at; customers.new_customers → customers.created_at; customers.total_balance → customers.snapshot_date
 Steep identifiers: orders.smb_orders → smb-orders; revenue_per_customer → revenue-per-customer; customers.new_customers → new-customers; customers.total_balance → total-balance
-Format per metric: revenue_per_customer → number
+Format per metric: orders.revenue → number, currency USD; revenue_per_customer → number, currency USD
 Display names: table customers → Customers; orders.country → Country; orders.smb_orders → SMB orders';
 ```
 

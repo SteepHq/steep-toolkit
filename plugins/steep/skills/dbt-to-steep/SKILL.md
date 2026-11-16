@@ -116,6 +116,8 @@ Rules that are easy to get wrong:
   not the semantic model name.
 - dbt ratios are fractions. Write `format` on every ratio. Steep defaults to
   `percentage`.
+- Write `currency`, `unit` or `decimals` only when the source states them. A
+  ratio with a `currency` needs `format: number`.
 - One join path per pair of tables, single-column keys only. A duplicate fails
   the whole sync.
 - Never write `accessPolicies`. dbt has no row-level security of its own.
@@ -152,6 +154,7 @@ across files.
   - duplicate module, metric, entity, slice and dimension identifiers;
   - two modules on one table, and duplicate join paths;
   - derived-ratio operands and metric dimensions that do not resolve.
+  - a `currency` or `unit` that Steep drops: on a percentage, or both together.
   - a `targets:` file that is not exactly one `{schema, table}` object.
 - **Warnings** for likely import mistakes:
   - a file without the schema line;
@@ -174,8 +177,9 @@ End with a short import report:
 - Which spec the input used (latest, legacy or both), and whether it was read
   from `semantic_manifest.json` or the YAML files.
 - Counts: modules, dimensions, metrics by `type`, slices, join paths.
-- **Needs a decision**: ratio formats you guessed, dimension types you could
-  not read, time dimensions that are computed.
+- **Needs a decision**: ratio formats you guessed, money metrics whose
+  currency the source does not state, dimension types you could not read, time
+  dimensions that are computed.
 - **Not imported**, each with the dbt name and why. This covers everything
   under "Not representable in Steep" in the mapping that the project uses.
 - **Changed meaning**:
