@@ -46,19 +46,27 @@ actually lists over this list.
 Use these to **verify** what actually landed in the workspace against what the
 YAML intends, the third leg of debugging.
 
-## The limit: the sync log stays in the Steep UI
+## Reading sync results
 
-`GET https://api.steep.app/v1/code/syncs/{id}` returns whether a sync with a
-known id completed or failed. The help center lists no way to list syncs or
-read the sync log, and the MCP cannot trigger a sync. So an agent usually
-**cannot fetch why a sync failed.**
+With the client's API key (scope `code-syncs:read`), an agent can read sync
+results:
+
+- `GET https://api.steep.app/v1/code/syncs?datasourceId=<id>&limit=1`: the
+  datasource's last sync, with `outcome` (queued, running, completed, failed),
+  created, updated and removed items, `errors` and `warnings`.
+- `GET https://api.steep.app/v1/code/syncs/{id}`: one sync by its `id` (from
+  the list above).
+
+The datasource ID is the last part of the URL after opening Settings, Data
+Source, and clicking edit on the data source; Steep support sends it on request.
 
 Consequences for the Debug mode:
 
-- Never claim you "checked the sync logs" unless the user pasted them.
-- To debug: **predict** outcomes from the YAML (`debugging.md`), **interpret** a
-  log the user pastes from the Steep UI, and **verify** the resulting state with
-  the read-only MCP tools above.
+- Never claim you "checked the sync logs" unless you fetched them or the user
+  pasted them.
+- To debug: **predict** outcomes from the YAML (`debugging.md`), **interpret**
+  the last sync's errors and warnings (or a pasted log), and **verify** the
+  resulting state with the read-only MCP tools above.
 - If a sync genuinely failed for a reason you can't reproduce from the YAML, that
   is a `handoff-report.md` situation.
 

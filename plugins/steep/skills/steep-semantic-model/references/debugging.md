@@ -1,9 +1,9 @@
 # Debugging the Steep semantic model YAML
 
-How to diagnose and fix a sync problem. You cannot fetch the sync log (only a
-sync's completed or failed state by id, see `capabilities-and-limits.md`), so
-you work from the YAML, the validate and dry run calls (SKILL.md, Build step
-4), a log the user pastes, and the read-only MCP.
+How to diagnose and fix a sync problem. You work from the YAML, the validate
+and dry run calls (SKILL.md, Build step 4), the last sync result
+(`GET /v1/code/syncs?datasourceId=<id>&limit=1`, which returns its errors and
+warnings) or a log the user pastes, and the read-only MCP.
 
 ## Contents
 
@@ -72,8 +72,8 @@ Work in order; stop when you find the cause.
 3. **Predict.** Run validate, then the dry run on the branch's files (SKILL.md,
    Build step 4). Check every file's root key: one that is neither `module:`
    nor `targets:` is skipped with no error.
-4. **Match the exact message.** Ask the user to paste the sync result from the
-   Steep UI (sync history) and find its distinctive words in the
+4. **Match the exact message.** Fetch the last sync's `errors` and `warnings`
+   (or ask the user to paste the sync log from the Steep UI) and find its distinctive words in the
    [Message index](#message-index) (templates are verbatim, with
    `<placeholders>`).
 5. **Check the silent cases** when there is no message:

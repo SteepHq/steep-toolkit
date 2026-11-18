@@ -195,7 +195,10 @@ Base `https://api.steep.app`, header `Authorization: ApiKey $STEEP_API_KEY`.
   building, so you do not create duplicates.
 - `/v1/metrics/{metricId}/query`: aggregated results plus the SQL, to
   check a metric after a sync.
-- `GET /v1/code/syncs/{id}`: whether a sync completed or failed.
+- `GET /v1/code/syncs?datasourceId=<id>&limit=1`: the datasource's last
+  sync: `outcome` (queued, running, completed, failed), what was created,
+  updated and removed, and its `errors` and `warnings`. Its `id` works with
+  `GET /v1/code/syncs/{id}`. The key needs the `code-syncs:read` scope.
 - `/semantic-layer-syncs` is deprecated; use `/v1/code/syncs`.
 
 ## Metric rules
@@ -232,15 +235,16 @@ Validate and dry run check structure only. These rules keep the numbers right.
 
 ## Debug
 
-**Constraint: you cannot fetch the sync log.** `GET /v1/code/syncs/{id}` tells
-you whether a sync with a known id completed or failed; the help center lists
-no way to list syncs, so the messages still come from the log the user pastes.
-Never claim you read a log you did not see.
+**Read the real sync result.** With the client's key, fetch the last sync
+(`GET /v1/code/syncs?datasourceId=<id>&limit=1`, see Useful API calls): it
+returns the outcome, the errors and the warnings. Without a key, ask the user
+to paste the sync log from the Steep UI. Never claim you read a log you did
+not see.
 
 1. **Predict.** Validate the repo's files (Build step 4a), then dry run the
    branch's files (4b): it returns the errors and warnings the sync would.
-2. **Interpret.** Ask the user to paste the sync log from the Steep UI (sync
-   history), then match each message in `references/debugging.md`.
+2. **Interpret.** Fetch the last sync (or ask the user to paste the log),
+   then match each message in `references/debugging.md`.
 3. **Verify.** Use the read-only MCP (`list_modules`, `list_metrics`,
    `search_metrics`, `list_entities`, `get_metric`, `query_metric`) to compare
    what landed against what the YAML intends.

@@ -38,8 +38,8 @@ copy-pasteable as one message. Use this template:
 
 **Sync log (verbatim from Steep UI → sync history):**
 ``​`
-<paste the errors and warnings exactly; the sync log is not available via
-MCP/API, so this must be copied from the UI>
+<the errors and warnings exactly, from GET /v1/code/syncs?datasourceId=<id>&limit=1
+or copied from the Steep UI sync history>
 ``​`
 
 **Expected:** <what the user expected to happen>

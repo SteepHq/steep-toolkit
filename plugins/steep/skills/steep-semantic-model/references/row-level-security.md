@@ -78,8 +78,9 @@ module:
 
 ## 3. Check it
 
-1. **Validate and dry run do not check policies.** A broken or missing
-   attribute passes both. So check the policy yourself: `git diff` every `accessPolicies:` block and confirm no existing
+1. **Validate and dry run do not check that a policy is correct.** The dry
+   run lists which policies would be created, updated or removed, but a broken
+   or missing attribute passes both. So check the policy yourself: `git diff` every `accessPolicies:` block and confirm no existing
    policy was removed or altered unless the user asked; confirm each
    `attribute` is `user.email` or `user.<column>` where that column exists in
    the user attributes table; confirm the filtered column exists on the
