@@ -147,7 +147,9 @@ answer; naming the rule is usually most of the fix.
    "<file text>" }` (forward slashes, `.yml` or `.yaml`, each path once, 10 MB
    total).
 
-   a. **Validate, after every change (fast, no key, touches nothing).**
+   a. **Validate, after every change (fast, no key, touches nothing).** It
+      catches typos and structure only: it does not know the workspace, so
+      it cannot see conflicts with existing modules, metrics or tables.
       `POST https://api.steep.app/v1/code/validate` with `{ "files": [...] }`.
       It returns `{ "valid": true|false, "problems": [...] }` (each with
       `severity`, `message`, file). Fix until `valid` is true. Put
@@ -155,7 +157,10 @@ answer; naming the rule is usually most of the fix.
       on top of each file so editors flag mistakes as you type; that URL also
       returns the full schema.
 
-   b. **Dry run, before merging (needs the client's API key).**
+   b. **Dry run, before merging (needs the client's workspace API key).** A
+      fake sync against the real workspace: it returns exactly the messages
+      the real sync would, without changing anything. This is the check that
+      proves the change will sync.
       `POST https://api.steep.app/v1/code/syncs` with header
       `Authorization: ApiKey <key>` and body
       `{ "datasourceId": "<id>", "dryRun": true, "files": [...] }`.
