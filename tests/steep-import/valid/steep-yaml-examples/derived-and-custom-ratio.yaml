@@ -5,24 +5,44 @@ module:
   schema: steep_demo
   table: fact_orders
   label: Orders
-  description: One row per order.
+  description: >-
+    One row per order (order_id is unique). Home table for order counts and
+    order value; payments live in the transactions module.
+  synonyms: [purchases]
+  agent_instructions: Order value is in USD and excludes VAT.
 
   dimensions:
     - column: country
       label: Country
       type: country
+      synonyms: [market]
     - column: created_at
       label: Created at
       type: time
 
   metrics:
     # --- base metrics that the derived-ratio references by identifier ---
+    # Both use the same time column and no filters, so the ratio below compares
+    # the same orders on both sides.
     - identifier: order_revenue
       name: Order revenue
-      description: Sum of order value in USD.
+      description: |
+        **Order value in USD, excluding VAT**
+
+        **Logic**
+        - Sums `value` per order, dated by order `created_at`.
+        - All statuses included, so it matches *Orders* for AOV.
+
+        **Use it for** order value and AOV. For settled money use *Revenue*.
       type: sum
       value: fact_orders.value
       time: fact_orders.created_at
+      format: number
+      currency: USD
+      decimals: 0
+      synonyms: [order value, GMV]
+      examples:
+        - What was order value in the US last month?
       dimensions:
         - country
       slices:
@@ -37,21 +57,45 @@ module:
 
     - identifier: order_count
       name: Orders
-      description: Count of orders.
+      description: |
+        **Number of orders, all statuses**
+
+        **Logic**
+        - Counts rows in `fact_orders`, dated by `created_at`.
+
+        **Use it for** order volume and as the AOV denominator.
       type: count
       time: fact_orders.created_at
+      format: number
+      decimals: 0
+      synonyms: [order count, number of orders]
+      examples:
+        - How many orders did we get this week?
       dimensions:
         - country
 
     # --- custom-ratio: a percentage computed from two SQL expressions ---
     - identifier: completed_order_rate
       name: Completed order rate
-      description: Share of orders that reached completed status.
+      description: |
+        **Share of orders that reached completed status**
+
+        **Logic**
+        - Numerator: orders with status `completed`. `ELSE 0` makes an empty
+          period show 0%, not blank.
+        - Denominator: all orders, same date and filters.
+
+        **Use it for** fulfilment health. Lower means more cancellations.
       type: custom-ratio
-      numerator_sql: "SUM(CASE WHEN fact_orders.status = 'completed' THEN 1 END)"
+      numerator_sql: "SUM(CASE WHEN fact_orders.status = 'completed' THEN 1 ELSE 0 END)"
       denominator_sql: "COUNT(*)"
       format: percentage
+      decimals: 1
       time: fact_orders.created_at
+      synonyms: [completion rate, fulfilment rate]
+      agent_instructions: Higher is better. Never average daily rates; query the period.
+      examples:
+        - What share of orders were completed last month?
       dimensions:
         - country
 
@@ -59,13 +103,27 @@ module:
     # No `time`, no module binding. Its dimensions must be a SUBSET of the
     # numerator metric's dimensions (order_revenue has [country]), extra
     # dimensions are dropped silently.
+    # A money ratio needs `format: number` plus `currency`, else it shows as %.
     - identifier: avg_order_value
       name: Average order value
-      description: Revenue per order (order_revenue / order_count).
+      description: |
+        **Average order value (AOV) in USD, excluding VAT**
+
+        **Logic**
+        - *Order revenue* divided by *Orders*, same date and no filters on
+          either side.
+
+        **Use it for** basket size. Split by country to compare markets.
       type: derived-ratio
       numerator: order_revenue
       denominator: order_count
       format: number
+      currency: USD
+      decimals: 0
+      synonyms: [AOV, basket size]
+      agent_instructions: Higher is better. Never average AOV across countries; query the total.
+      examples:
+        - What is our AOV by country?
       dimensions:
         - country
 
@@ -74,12 +132,25 @@ module:
     # metric. A derived-ratio cannot define its own slices: block.
     - identifier: avg_us_order_value
       name: Average US order value
-      description: US order revenue per order.
+      description: |
+        **US order value per order, in USD**
+
+        **Logic**
+        - *Order revenue* (US slice) divided by *Orders* (all countries).
+        - The denominator is not sliced, so this reads as US value per order
+          worldwide, not US AOV. For US AOV, filter by country instead.
+
+        **Use it for** the US share of value per order.
       type: derived-ratio
       numerator:
         metric: order_revenue
         slice: us
       denominator: order_count
       format: number
+      currency: USD
+      decimals: 0
+      synonyms: [US value per order]
+      examples:
+        - How much US order value do we get per order?
       dimensions:
         - country
