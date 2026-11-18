@@ -4,18 +4,23 @@ module:
   schema: steep_demo
   table: dim_customer
   label: Customers
-  description: One row per customer.
+  description: >-
+    One row per customer (id is unique). Home table for customer attributes.
+  synonyms: [users, clients]
 
   dimensions:
     - column: country
       label: Country
       type: country
+      synonyms: [market]
 
   entities:
     - identifier: customer
       name: Customer
       primary_key: id
-      icon_name: user             # optional, kebab-case; an unknown name only
+      synonyms: [account, client]
+      agent_instructions: Use for questions about one named customer.
+      icon_name: user            # optional, kebab-case; an unknown name only
                                   # warns and renders the default icon, see the
                                   # help center for the supported icon list.
       properties:                 # required, non-empty
@@ -32,6 +37,8 @@ module:
           name: Plan
           type: string
       metrics:                    # metric identifiers to associate with the entity
+        - revenue
+        - transaction_count
         - unique_customers
 
   joinPaths:

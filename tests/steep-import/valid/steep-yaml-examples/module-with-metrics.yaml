@@ -1,16 +1,25 @@
 # A fact-table module: dimensions, three metric types, and a join path.
 # One module per physical table. Fields are snake_case except `joinPaths`.
+# Every metric shows the full standard: Markdown description, display fields,
+# AI context. Copy that shape, not just the fields.
 module:
   identifier: transactions          # stable handle, unique across all files
   schema: steep_demo
   table: fact_transactions          # physical table; identifier need not equal it
   label: Transactions
-  description: One row per payment transaction.
+  description: >-
+    One row per payment transaction (transaction_id is unique). Home table for
+    revenue because it holds the settled amount; orders can change after payment.
+  synonyms: [payments, sales transactions]
+  agent_instructions: >-
+    Amounts are in USD. Data for a day is complete the next morning, so treat
+    today as partial.
 
   dimensions:
     - column: country
       label: Country
       type: country
+      synonyms: [market]
     - column: payment_method
       label: Payment method
       type: categorical
@@ -21,11 +30,27 @@ module:
   metrics:
     - identifier: revenue
       name: Revenue
-      description: Sum of completed/settled transaction amount, in USD.
+      description: |
+        **Settled transaction revenue in USD**
+
+        **Logic**
+        - Sums `amount` per transaction, dated by `created_at`.
+        - Keeps only `completed` and `settled` status. Pending and failed
+          payments are not revenue.
+
+        **Use it for** revenue questions. For order counts use *Transactions*.
       type: sum                     # use `type`, never `calculation`
       value: fact_transactions.amount
       time: fact_transactions.created_at
       category: Commercial
+      format: number
+      currency: USD
+      decimals: 0
+      synonyms: [sales, turnover]
+      agent_instructions: Higher is better. Usually split by country.
+      examples:
+        - What was revenue last month by country?
+        - How did revenue change week over week?
       filters:
         - column: status
           operator: in
@@ -36,19 +61,48 @@ module:
 
     - identifier: transaction_count
       name: Transactions
-      description: Count of transaction rows.
+      description: |
+        **Number of payment transactions, all statuses**
+
+        **Logic**
+        - Counts rows in `fact_transactions`, dated by `created_at`.
+        - No filter: failed and pending payments are included.
+
+        **Use it for** payment volume. For money use *Revenue*.
       type: count
       time: fact_transactions.created_at
+      format: number
+      decimals: 0
+      synonyms: [payments, number of transactions]
+      examples:
+        - How many transactions did we have yesterday?
       dimensions:
         - country
         - payment_method
 
     - identifier: unique_customers
       name: Unique customers
-      description: Count of distinct customers with transaction activity.
+      description: |
+        **Number of distinct customers with at least one transaction**
+
+        **Logic**
+        - Counts distinct `customer_id`, dated by `created_at`.
+        - A customer active in two weeks counts once per week, so weekly values
+          do not add up to the monthly value.
+
+        **Use it for** active customer counts. For new customers build a
+        cohort or a first-order metric instead.
       type: count-distinct
       distinct_on: fact_transactions.customer_id
       time: fact_transactions.created_at
+      format: number
+      decimals: 0
+      synonyms: [active customers, buyers]
+      agent_instructions: >-
+        Distinct counts do not add up across periods or countries. Query the
+        total directly, never sum the parts.
+      examples:
+        - How many customers bought something last month?
       dimensions:
         - country
 
@@ -57,6 +111,9 @@ module:
     # Steep accepts only one-to-one / one-to-many (never many-to-one), so for a
     # fact→dimension relationship, declare the inverse path from the dimension
     # module instead.
+    # Fan-out warning: `revenue` lives on this "one" side. If it were split by a
+    # dimension of fact_order_items, each transaction would count once per item.
+    # That is why revenue lists only dimensions from this table.
     - from:
         column: id
       to:
