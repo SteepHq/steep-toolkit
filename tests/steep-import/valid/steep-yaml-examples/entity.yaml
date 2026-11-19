@@ -1,4 +1,6 @@
 # A module with an entities block. Entities are defined inside their module.
+# Meant to sit next to module-with-metrics.yaml: it links metrics defined
+# there. Synced alone, it warns that those metrics don't exist.
 module:
   identifier: customers
   schema: steep_demo
@@ -20,15 +22,16 @@ module:
       primary_key: id
       synonyms: [account, client]
       agent_instructions: Use for questions about one named customer.
-      icon_name: user            # optional, kebab-case; an unknown name only
+      icon_name: user             # optional, kebab-case; an unknown name only
                                   # warns and renders the default icon, see the
                                   # help center for the supported icon list.
       properties:                 # required, non-empty
         - column: id
           name: Customer ID
           type: uuid
-        - column: email
-          name: Email
+        - column: email           # personal data, included on purpose as an
+          name: Email             # example; add personal-data properties only
+                                  # when you ask for them.
           type: string
         - column: signup_date
           name: Signed up

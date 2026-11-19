@@ -171,12 +171,9 @@ Work in order; stop when you find the cause.
 | `Slice "<name>" in metric "<metric>" has no identifier; one will be generated from its name. Add an explicit 'identifier' so slice references stay stable if the name changes.` | W | The slice still syncs; an identifier is generated (snake_case of the name, numeric suffix on collision). Add an explicit `identifier` so derived-ratio references never break on rename. |
 | `Slice "<identifier>" cannot be deleted because it is used in derived metric "<id>"` (plural: `...used in derived metrics "<a>", "<b>"`) | F | You removed a slice that a derived metric still references. The **whole sync fails and rolls back**. Remove or update the referencing derived metric first, or do both changes in the same sync. |
 
-How slices are matched across syncs (so references survive): by `identifier`
-first, then by name (only if the name matches exactly one existing slice), then
-by identical filter content (only if unique). A match patches the slice in
-place. Changing an identifier-less slice's **name and filter together** orphans
-it: it is deleted and recreated with a new generated identifier, and anything
-referencing it breaks or fails the sync.
+Always give a slice an explicit `identifier`. If a slice has no identifier
+and you change its **name and filter in the same sync**, it is deleted and
+recreated, and derived ratios that reference it break.
 
 ### Derived-ratio
 

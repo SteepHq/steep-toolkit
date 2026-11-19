@@ -48,7 +48,7 @@ YAML intends, the third leg of debugging.
 
 ## Reading sync results
 
-With the client's API key (scope `code-syncs:read`), an agent can read sync
+With your API key (scope `code-syncs:read`), an agent can read sync
 results:
 
 - `GET https://api.steep.app/v1/code/syncs?datasourceId=<id>&limit=1`: the
@@ -57,8 +57,12 @@ results:
 - `GET https://api.steep.app/v1/code/syncs/{id}`: one sync by its `id` (from
   the list above).
 
-The datasource ID is the last part of the URL after opening Settings, Data
-Source, and clicking edit on the data source; Steep support sends it on request.
+To find the datasource ID, first call
+`GET https://api.steep.app/v1/workspace/datasources`: each datasource's `id` is
+the `datasourceId` (scope `datasources:read`; admins only). If that is not
+possible, it is the last part of the URL after opening Settings, Data Source,
+and clicking edit on the data source. Otherwise, Steep support sends it on
+request.
 
 Consequences for the Debug mode:
 
@@ -89,11 +93,14 @@ reload; a failed sync changes nothing.
 
 The dry run previews exactly what a sync would change, without changing
 anything: `POST https://api.steep.app/v1/code/syncs` with header
-`Authorization: ApiKey <key>` (the client's own key, from Settings, API) and
+`Authorization: ApiKey <key>` (your own key, from Settings, API) and
 `{ "datasourceId": "<id>", "dryRun": true, "files": [...] }`. It lists the
 identifiers that would be created, updated, removed and left unchanged, plus
-errors and warnings. Full steps: SKILL.md, Build step 4. Some teams also keep a
-separate workspace on a dev branch and dev warehouse schemas; that is a
-workflow pattern, not a Steep feature.
+errors and warnings. When the preview completes it also lists `accessPolicies`
+grouped as `created`, `updated`, `removed` and `unchanged` (null when the
+preview fails); it does not check that a policy is correct. Full steps:
+SKILL.md, Build step 4. Some teams also keep a separate workspace on a dev
+branch and dev warehouse schemas; that is a workflow pattern, not a Steep
+feature.
 
 Maintained by Steep. Spotted an inaccuracy? Tell support@steep.app.

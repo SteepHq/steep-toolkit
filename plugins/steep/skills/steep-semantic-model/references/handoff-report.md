@@ -14,7 +14,7 @@ to triage from the report alone.
   settings, which are UI-only today) and wants it on Steep's radar.
 - Anything only Steep can do (workspace-level fix, GitHub integration issue).
 
-If instead the problem is the user's YAML, fix it, don't write a handoff for
+If instead the problem is your YAML, fix it, don't write a handoff for
 something self-serviceable.
 
 ## Fill it in, don't hand over a blank form

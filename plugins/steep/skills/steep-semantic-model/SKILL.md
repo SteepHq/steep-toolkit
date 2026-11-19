@@ -53,7 +53,7 @@ sync messages, and fixes.
 
 ## Invariants
 
-Violating any of these is what actually breaks customer workspaces. Check them
+Violating any of these is what actually breaks your workspace. Check them
 before you write or diagnose. When one is in play, name it explicitly in your
 answer; naming the rule is usually most of the fix.
 
@@ -81,8 +81,8 @@ answer; naming the rule is usually most of the fix.
 5. **Set metric kind with `type:`, never `calculation:`.** `calculation:` is
    legacy, warns, and cannot express `derived-ratio`. Write `type:` on every
    metric you create or edit. Do not rewrite the other existing metrics from
-   `calculation:` to `type:` unless asked; a sweep across metrics the user did
-   not mention is a change they did not ask for.
+   `calculation:` to `type:` unless asked; a sweep across metrics you did not
+   mention is a change you did not ask for.
 
 6. **Join paths are `one-to-one` or `one-to-many`.** `many-to-one` is rejected.
    Declare from the "one" side, usually dimension to fact as `one-to-many`.
@@ -105,14 +105,16 @@ answer; naming the rule is usually most of the fix.
     merge is a push. There is no draft state.
 
 11. **`accessPolicies:` is row-level security. Write or change it only when
-    the user asks, never as a side effect.** Because omission deletes, dropping
-    the block removes the protection silently. Follow
+    you ask for it, never as a side effect.** Because omission deletes,
+    dropping the block removes the protection silently. Follow
     `references/row-level-security.md`, and never claim a policy works until
-    the user has tested it as a member. **Any added, changed or removed
-    policy line triggers the row-level security warning** in that file: stop,
-    show it, and get an explicit yes before committing or pushing. Steep's
-    validate and dry run do not report policy changes, so this warning is the
-    only safeguard.
+    you have tested it as a member. **Any added, changed or removed policy
+    line triggers the row-level security warning** in that file: stop, show
+    it, and get an explicit yes before committing or pushing. Always read
+    `accessPolicies` in the dry run and stop on any policy change you did not
+    ask for. The dry run does not check that a policy is correct (a wrong
+    attribute such as `country` instead of `user.country` passes), so still
+    warn first and still test as a real member.
 
 ## Build
 
@@ -141,11 +143,12 @@ answer; naming the rule is usually most of the fix.
      metric answers which question, conventions, open points).
 4. **Right after generating, run both checks. This is mandatory.** Do not
    report the work as done, commit, or push until validate returns
-   `valid: true` and the dry run shows no errors and no unexpected removals.
+   `valid: true` and the dry run shows no errors, no unexpected removals and
+   no unexpected access policy changes.
    If you cannot run one, say which. Both take the same `files` list: every
-   Steep YAML file in the repo, not only the changed ones, each as `{ "path": "<path from repo root>", "content":
-   "<file text>" }` (forward slashes, `.yml` or `.yaml`, each path once, 10 MB
-   total).
+   Steep YAML file in the repo, not only the changed ones, each as
+   `{ "path": "<path from repo root>", "content": "<file text>" }` (forward
+   slashes, `.yml` or `.yaml`, each path once, 10 MB total).
 
    a. **Validate, after every change (fast, no key, touches nothing).** It
       catches typos and structure only: it does not know the workspace, so
@@ -157,7 +160,7 @@ answer; naming the rule is usually most of the fix.
       on top of each file so editors flag mistakes as you type; that URL also
       returns the full schema.
 
-   b. **Dry run, before merging (needs the client's workspace API key).** A
+   b. **Dry run, before merging (needs your workspace API key).** A
       fake sync against the real workspace: it returns exactly the messages
       the real sync would, without changing anything. This is the check that
       proves the change will sync.
@@ -166,19 +169,32 @@ answer; naming the rule is usually most of the fix.
       `{ "datasourceId": "<id>", "dryRun": true, "files": [...] }`.
       Always send `"dryRun": true`. It previews exactly what the sync would
       change (identifiers created, updated, removed, unchanged), plus errors
-      and warnings. Anything in
-      **removed** the user did not ask to delete is a mistake: stop and fix it.
+      and warnings. Anything in **removed** you did not ask to delete is a
+      mistake: stop and fix it. When the preview completes, the response also
+      has `accessPolicies`, grouped as `created`, `updated`, `removed` and
+      `unchanged`, each entry `{ module, policy }` (null when the preview
+      fails). Read it every time: any policy change you did not ask for is a
+      mistake, stop and fix it.
 
-      **API key note.** The dry run needs the client's own Steep API key and
-      their datasource ID: ask for both at the start of the task, not at the
-      end. The user creates the key under Settings, API, Create API key, with
-      only the scopes needed and a short expiry (it is shown once and can be
-      revoked there). A key reads like a workspace admin, so keep it out of
-      chat, files, commits and logs: ask the user to set it as `STEEP_API_KEY`
-      and send `Authorization: ApiKey $STEEP_API_KEY`. With no key, still run
-      validate and tell the user plainly the dry run was skipped, so the change
-      is not fully checked. The datasource ID is the last part of the URL after
-      opening Settings, Data Source, and clicking edit on the data source;
+      **API key note.** The dry run needs your own Steep API key and your
+      datasource ID: the agent asks for both at the start of the task, not at
+      the end. You create the key under Settings, API, Create API key, with a
+      short expiry (it is shown once and can be revoked there). Tick only the
+      read scopes the agent uses: `modules:read`, `metrics:read` and
+      `entities:read` (list what exists), `metric-queries:read` (query a
+      metric), `code-syncs:read` (read sync results) and `datasources:read`
+      (find the datasource ID), plus whatever the dry run needs (Steep support
+      can confirm which). A key reads like a workspace admin, so keep it out
+      of chat, files, commits and logs: set it as `STEEP_API_KEY`, and the
+      agent sends `Authorization: ApiKey $STEEP_API_KEY`. With no key, the
+      agent still runs validate and tells you plainly the dry run was skipped,
+      so the change is not fully checked.
+
+      **Datasource ID.** First call
+      `GET https://api.steep.app/v1/workspace/datasources`: each datasource's
+      `id` is the `datasourceId` (needs `datasources:read`; admins only). If
+      that is not possible, it is the last part of the URL after opening
+      Settings, Data Source, and clicking edit on the data source. Otherwise,
       Steep support sends it on request.
 
    Neither check proves a column holds the right data, so confirm tables and
@@ -192,9 +208,13 @@ answer; naming the rule is usually most of the fix.
 Base `https://api.steep.app`, header `Authorization: ApiKey $STEEP_API_KEY`.
 
 - `/v1/modules`, `/v1/metrics`, `/v1/entities`: list what exists before
-  building, so you do not create duplicates.
+  building, so you do not create duplicates. Scopes `modules:read`,
+  `metrics:read`, `entities:read`.
 - `/v1/metrics/{metricId}/query`: aggregated results plus the SQL, to
-  check a metric after a sync.
+  check a metric after a sync. Scope `metric-queries:read`.
+- `GET /v1/workspace/datasources`: each datasource's `id` is the
+  `datasourceId` the dry run and sync results need. Scope
+  `datasources:read`; admins only.
 - `GET /v1/code/syncs?datasourceId=<id>&limit=1`: the datasource's last
   sync: `outcome` (queued, running, completed, failed), what was created,
   updated and removed, and its `errors` and `warnings`. Its `id` works with
@@ -227,15 +247,15 @@ Validate and dry run check structure only. These rules keep the numbers right.
 11. Before you add a filter, count what it removes and report it. Keep a filter
     only when it defines the metric (cancelled orders are not revenue) and say
     so in the description. Offer other cuts as a dimension or slice.
-12. Build the numbers people decide with (rates, averages, values), tied to the
-    client's questions, not only counts.
+12. Build the numbers people decide with (rates, averages, values), tied to
+    your questions, not only counts.
 13. After the sync, compare each key metric for one closed period with a number
-    the client already trusts (`/v1/metrics/{metricId}/query`). Write every
+    you already trust (`/v1/metrics/{metricId}/query`). Write every
     assumption in the description and the README. A silent choice is a hidden bug.
 
 ## Debug
 
-**Read the real sync result.** With the client's key, fetch the last sync
+**Read the real sync result.** With your key, fetch the last sync
 (`GET /v1/code/syncs?datasourceId=<id>&limit=1`, see Useful API calls): it
 returns the outcome, the errors and the warnings. Without a key, ask the user
 to paste the sync log from the Steep UI. Never claim you read a log you did

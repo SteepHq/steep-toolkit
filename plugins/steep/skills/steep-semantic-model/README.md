@@ -61,9 +61,13 @@ too.
 
 Every push to the connected branch syncs, so the agent checks first with
 Steep's validate and dry run (see `SKILL.md`, Build step 4). The dry run needs
-a Steep API key (Settings, API, with only the scopes needed and a short expiry)
-and your datasource ID: keep the key in an environment variable
-(`STEEP_API_KEY`), never in chat or a file.
+a Steep API key (Settings, API, with a short expiry) and your datasource ID.
+Tick only the read scopes the agent uses: `modules:read`, `metrics:read` and
+`entities:read` (list what exists), `metric-queries:read` (query a metric),
+`code-syncs:read` (read sync results) and `datasources:read` (find the
+datasource ID), plus whatever the dry run needs (Steep support can confirm
+which). Keep the key in an environment variable (`STEEP_API_KEY`), never in
+chat or a file.
 
 ## What to have ready
 
@@ -84,8 +88,8 @@ dedicated repo is the safest setup.
 ## Starting before Steep is connected
 
 You can. Nothing syncs until the Steep GitHub app is pointed at a repo and
-branch, so write the YAML now, review it in pull requests, connect later. `references/examples/` has
-known-good files to copy.
+branch, so write the YAML now, review it in pull requests, connect later.
+`references/examples/` has known-good files to copy.
 
 ## What's inside
 
