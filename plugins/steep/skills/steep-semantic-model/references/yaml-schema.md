@@ -52,8 +52,8 @@ How Steep decides what a file is:
   loudly** with a clear error and the sync aborts; it is not silently ignored.
 - A file with **no recognized root at all** (a `metric:`-only file, a CI config,
   any other YAML in the repo) is **silently skipped, no error is raised.** Those
-  definitions simply never appear in Steep. If you say "I added a metric
-  file and it didn't show up," the agent checks the root key first.
+  definitions simply never appear in Steep. If the user says "I added a metric
+  file and it didn't show up," check the root key first.
 
 One module per file is the normal convention. The schema is **strict**: unknown
 extra keys cause a validation failure (an `Unprocessable`, see `debugging.md`).
@@ -91,7 +91,7 @@ per file type at `/v1/code/schema/module` and `/v1/code/schema/targets`.
 | `dimensions` | no | List of [Dimension](#dimension). |
 | `metrics` | no | List of [Metric](#metric). |
 | `joinPaths` | no | List of [Join path](#join-path) (camelCase). |
-| `accessPolicies` | no | Row-level security. See [Access policy](#access-policy). The agent writes it only when you ask for it, and otherwise preserves it. |
+| `accessPolicies` | no | Row-level security. See [Access policy](#access-policy). Write it only when the user asks for it; otherwise preserve it. |
 | `entities` | no | List of [Entity](#entity). |
 
 `identifier` is the stable Steep handle; `table` is the physical warehouse table.
@@ -355,9 +355,9 @@ it controls which rows each person is allowed to see.
 
 Fields per policy: `column` (required), `attribute` (required, `user.email` or
 `user.<attribute>`), and `schema`/`table` (optional, for a column on a joined
-table). The agent writes or changes it only when you ask for it; **do not
-write, change, or remove it as part of other work.** Deleting the block
-deletes the protection on the next sync. When you ask for row-level security,
+table). Write or change it only when the user asks for it; **do not write,
+change, or remove it as part of other work.** Deleting the block deletes the
+protection on the next sync. When the user asks for row-level security,
 follow `references/row-level-security.md`.
 
 ## Entity

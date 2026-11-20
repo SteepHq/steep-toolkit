@@ -29,7 +29,7 @@ verify.
 ## Stopping the code workflow for the whole workspace
 
 That is a workspace setting, not a YAML change. Do not change workspace
-settings on your behalf; hand off to Steep (support@steep.app) so the
+settings on the user's behalf; hand off to Steep (support@steep.app) so the
 switch is planned together.
 
 Maintained by Steep. Spotted an inaccuracy? Tell support@steep.app.

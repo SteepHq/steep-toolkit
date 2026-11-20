@@ -1,7 +1,7 @@
 # Row-level security (access policies)
 
 Row-level security decides which rows each member sees in a module. Write or
-change it only when you ask for it; never add, change or remove a policy
+change it only when the user asks for it; never add, change or remove a policy
 as a side effect of other work. Because omission deletes, dropping the
 `accessPolicies:` block removes the protection on the next sync and silently
 exposes rows. Canonical page: https://help.steep.app/setup-and-manage/row-level-security
@@ -79,21 +79,19 @@ module:
 
 ## 3. Check it
 
-1. **Read `accessPolicies` in the dry run.** When the dry run completes, its
-   response has `accessPolicies` grouped as `created`, `updated`, `removed`
-   and `unchanged`, each entry `{ module, policy }` (null when the preview
-   fails). Stop on any policy change you did not ask for.
+1. **Read `accessPolicies` in the dry run** (SKILL.md, Build step 4b). Stop on
+   any policy change the user did not ask for.
 2. **Validate and dry run do not check that a policy is correct.** A wrong or
    missing attribute (`country` instead of `user.country`) passes both. So
    check the policy yourself: `git diff` every `accessPolicies:` block and
-   confirm no existing policy was removed or altered unless you asked; confirm
+   confirm no existing policy was removed or altered unless the user asked; confirm
    each `attribute` is `user.email` or `user.<column>` where that column exists
    in the user attributes table; confirm the filtered column exists on the
    module's table or a joined one.
-3. **Test as a real member.** The only real test is you logging in as a
+3. **Test as a real member.** The only real test is the user logging in as a
    **member** (a test account with known attribute rows works well) and
-   comparing a metric against what that member should see. The agent asks you
-   to do this and report the result; never claim a policy works without it.
+   comparing a metric against what that member should see. Ask the user to do
+   this and report the result; never claim a policy works without it.
    Also note that Slack subscription PDFs show "Could not load data" for
    protected charts.
 4. A member with no matching rows sees **no** data from that module. Check

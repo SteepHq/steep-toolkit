@@ -61,13 +61,14 @@ too.
 
 Every push to the connected branch syncs, so the agent checks first with
 Steep's validate and dry run (see `SKILL.md`, Build step 4). The dry run needs
-a Steep API key (Settings, API, with a short expiry) and your datasource ID.
-Tick only the read scopes the agent uses: `modules:read`, `metrics:read` and
-`entities:read` (list what exists), `metric-queries:read` (query a metric),
-`code-syncs:read` (read sync results) and `datasources:read` (find the
-datasource ID), plus whatever the dry run needs (Steep support can confirm
-which). Keep the key in an environment variable (`STEEP_API_KEY`), never in
-chat or a file.
+a Steep API key created by an admin (Settings, API, with a short expiry) and
+your datasource ID. Tick `semantic-layer-sync:write`, which runs the dry run
+and reads sync results, plus only the read scopes the agent uses:
+`modules:read`, `metrics:read` and `entities:read` (list what exists),
+`metric-queries:read` (query a metric) and `datasources:read` (find the
+datasource ID). `semantic-layer-sync:write` can also start a real sync, so the
+agent always sends it as a dry run. Keep the key in an environment variable
+(`STEEP_API_KEY`), never in chat or a file.
 
 ## What to have ready
 
@@ -107,3 +108,5 @@ steep-semantic-model/
 ```
 
 Maintained by Steep. Spotted an inaccuracy? Tell support@steep.app.
+Last verified against the [code reference](https://help.steep.app/setup-and-manage/code-reference)
+and the Steep API: **2026-11-20**.
