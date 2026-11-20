@@ -23,6 +23,12 @@ DUPLICATES = [
     tuple(f"plugins/steep/skills/{skill}/{path}" for skill in IMPORT_SKILLS)
     for path in ("scripts/validate_steep_import.py",
                  "references/steep-module-schema.json")
+] + [
+    # The skill's examples double as validator fixtures; keep the copies equal.
+    (f"plugins/steep/skills/steep-semantic-model/references/examples/{name}",
+     f"tests/steep-import/valid/steep-yaml-examples/{name}")
+    for name in ("module-with-metrics.yaml", "derived-and-custom-ratio.yaml",
+                 "entity.yaml", "targets.yaml")
 ]
 
 
