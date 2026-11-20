@@ -29,7 +29,7 @@ output.
 - **Steep semantic model YAML:** <https://help.steep.app/setup-and-manage/code-reference> is
   canonical for the Steep YAML.
 - **Bundled schema:** `references/steep-module-schema.json` is the JSON Schema of
-  a Steep `module:` file, generated from Steep's schema source on 2026-10-29. On
+  a Steep `module:` file, generated from Steep's schema source on 2026-11-17. On
   any conflict, the code reference page wins. When the page is unreachable, work
   from the bundled schema and say so in the report.
 

@@ -316,7 +316,7 @@
         },
         "format": {
           "default": "percentage",
-          "description": "Format of a ratio metric. Defaults to 'percentage'. To show a ratio in a currency, set 'number' and add `currency`.",
+          "description": "How the metric's values are formatted. Defaults to 'percentage' for ratio metrics and 'number' for all others. To show values in a currency, use 'number' and add `currency`.",
           "type": "string",
           "enum": [
             "number",
@@ -677,7 +677,7 @@
           "description": "Column used for sum calculations. Format: `table.column`."
         },
         "format": {
-          "description": "How the metric's values are formatted. Defaults to 'number'. Add `currency` to show a number in a currency.",
+          "description": "How the metric's values are formatted. Defaults to 'percentage' for ratio metrics and 'number' for all others. To show values in a currency, use 'number' and add `currency`.",
           "type": "string",
           "enum": [
             "number",
@@ -1065,7 +1065,7 @@
         },
         "format": {
           "default": "percentage",
-          "description": "Format of a ratio metric. Defaults to 'percentage'. To show a ratio in a currency, set 'number' and add `currency`.",
+          "description": "How the metric's values are formatted. Defaults to 'percentage' for ratio metrics and 'number' for all others. To show values in a currency, use 'number' and add `currency`.",
           "type": "string",
           "enum": [
             "number",
@@ -1378,7 +1378,7 @@
           "description": "Deprecated alias of `type`. Ignored when `type` is set, so use `type` instead."
         },
         "format": {
-          "description": "How the metric's values are formatted. Defaults to 'number'. Add `currency` to show a number in a currency.",
+          "description": "How the metric's values are formatted. Defaults to 'percentage' for ratio metrics and 'number' for all others. To show values in a currency, use 'number' and add `currency`.",
           "type": "string",
           "enum": [
             "number",
@@ -1693,7 +1693,7 @@
           "description": "Column to count distinct values on. Format: `table.column`."
         },
         "format": {
-          "description": "How the metric's values are formatted. Defaults to 'number'. Add `currency` to show a number in a currency.",
+          "description": "How the metric's values are formatted. Defaults to 'percentage' for ratio metrics and 'number' for all others. To show values in a currency, use 'number' and add `currency`.",
           "type": "string",
           "enum": [
             "number",
@@ -2009,7 +2009,7 @@
           "description": "SQL expression that returns the metric value. Columns mentioned in expression should be of format table.column."
         },
         "format": {
-          "description": "How the metric's values are formatted. Defaults to 'number'. Add `currency` to show a number in a currency.",
+          "description": "How the metric's values are formatted. Defaults to 'percentage' for ratio metrics and 'number' for all others. To show values in a currency, use 'number' and add `currency`.",
           "type": "string",
           "enum": [
             "number",
@@ -2330,7 +2330,7 @@
         },
         "format": {
           "default": "percentage",
-          "description": "Format of a ratio metric. Defaults to 'percentage'. To show a ratio in a currency, set 'number' and add `currency`.",
+          "description": "How the metric's values are formatted. Defaults to 'percentage' for ratio metrics and 'number' for all others. To show values in a currency, use 'number' and add `currency`.",
           "type": "string",
           "enum": [
             "number",
